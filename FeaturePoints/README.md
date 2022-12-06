@@ -1,6 +1,6 @@
 # SLAM
 
-## find fundamental matrix
+## Finding fundamental matrix
 
 
 Finding fundamental matrix. Feature points and matches are found using SuperGlue solution (credits: Magic Leap, Inc.).
@@ -15,3 +15,7 @@ Example file is already here.
 To execute `match_pairs.py` script clone SuperGlue repo and run:
 
 `./match_pairs.py --input_dir dir_with_images_to_compare --output_dir path_to_dump_match_pairs_dir`
+
+## References
+
+https://sourishghosh.com/2016/fundamental-matrix-from-camera-matrices/
