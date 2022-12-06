@@ -19,3 +19,5 @@ To execute `match_pairs.py` script clone SuperGlue repo and run:
 ## References
 
 https://sourishghosh.com/2016/fundamental-matrix-from-camera-matrices/
+
+https://www.robots.ox.ac.uk/~vgg/hzbook/hzbook1/HZepipolar.pdf
