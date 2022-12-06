@@ -8,7 +8,7 @@ Finding fundamental matrix. Feature points and matches are found using SuperGlue
 To execute type: `./find_fundamental.py`.
 
 
-The points are taken from './dump_match_pairs/scene0711_00_frame-001680_scene0711_00_frame-001995_matches.npz'. This file is the result of `match_pairs.py` script from SuperGlue project: https://github.com/magicleap/SuperGluePretrainedNetwork
+The points are taken from `./dump_match_pairs/scene0711_00_frame-001680_scene0711_00_frame-001995_matches.npz`. This file is the result of `match_pairs.py` script from SuperGlue project: https://github.com/magicleap/SuperGluePretrainedNetwork
 Example file is already here.
 
 
