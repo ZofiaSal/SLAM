@@ -29,7 +29,7 @@ SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 4.0  # maximum observation range
 M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
-LM_SIZE = 2  # LM state size [x,y,z]
+LM_SIZE = 4  # LM state size [x,y,z]
 
 show_animation = True
 
@@ -106,6 +106,11 @@ def calc_landmark_position(x, z):
     zp[1, 0] = x[1, 0] + z[0] * math.sin(x[2, 0] + z[1])
     #zp[2, 0] = z[2] # Z coord doesnt change since robot is not moving in Z  
 
+    #return zp
+    zp[0, 0] = z[0]
+    zp[1, 0] = z[1]
+    zp[2, 0] = z[2]
+    zp[3, 0] = z[3]
     return zp
 
 
@@ -116,7 +121,8 @@ def get_landmark_position_from_state(x, ind):
 # lm landmark position [x,y,z] where lm is based on previous observations and z is our new observation
 def calc_innovation(lm, xEst, PEst, z, LMid):
     posZ = 0 # robots z coord doesnt change is always 0
-    delta = lm - xEst[0:2]
+    estimatedLM = lm[0:2] + lm[3] * [np.cos(lm[2] - xEst[2]), np.sin(lm[2] - xEst[2])]
+    delta = estimatedLM - xEst[0:2]
     q = (delta.T @ delta)[0, 0] # length of delta squared 
     z_angle = math.atan2(delta[1, 0], delta[0, 0]) - xEst[2, 0] # angle between our front and line from as to the landmark
     zp = np.array([[math.sqrt(q), pi_2_pi(z_angle)]]) # landmark from our perspective - how should it be based on previous observations
@@ -168,17 +174,15 @@ def new_movement_observations():
     for i in range(len(RFID[:, 0])):
         dx = RFID[i, 0] - posX
         dy = RFID[i, 1] - posY
-        dz = RFID[i, 2] - posZ 
         d = math.hypot(dx, dy)          #real distance
         angle = pi_2_pi(math.atan2(dy, dx) - posAngle) #real angle
+        
         zi = []
         if d <= MAX_RANGE:
             # counting noise for landmarks position
             dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # observed distance (real with noise)
             angle_n = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # observed angke (real with noise)
-            dzn = dz + np.random.randn() * Q_sim[2, 2] ** 0.5
-            zi = np.array([dn, angle_n, i])
-            #zi = np.array([d, angle, dz, i])
+            zi = np.array([posX, posY, posAngle + angle_n, 1, i])
             z = np.vstack((z, zi))
     
     new_movement_observations.iterator += 1
@@ -200,7 +204,7 @@ def main():
 
     # State Vector [x y yaw v]'
     xEst = np.zeros((STATE_SIZE, 1)) # Gauss mean
-    xEst[2,0]= np.pi/2 # only for our symulation
+    xEst[2,0]= np.pi/2 # only for our simulation
     PEst = np.eye(STATE_SIZE)       # covariance
 
     xDR = xEst  # Dead reckoning -> simulated position with noise (without observations)
