@@ -64,7 +64,6 @@ def main():
     (points1, points2) = matches.find_matches()
     print(points1, points2)
     X = calculatePoints3D(points1[:10,:],points2[:10,:],[5.0,0.0,0.0])
-    #X //= X[3]
     X = cv2.convertPointsFromHomogeneous(X.T)
     print(X)
 
