@@ -3,6 +3,8 @@ import numpy as np
 import cv2
 import find_matches_with_superglue as matches
 
+#Prepared beforehand with script images_prev/calibrate_camera.py and photos from images_prev:
+
 # intrinsic = np.matrix([[1.10137417e+03, 0.00000000e+00, 2.89506647e+02],
 #  [0.00000000e+00, 1.07474733e+03, 1.84718234e+02],
 #  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]],dtype = np.float64)

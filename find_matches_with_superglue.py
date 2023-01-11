@@ -3,7 +3,7 @@ import numpy as np
 def find_matches():
 
 	#Change depending on desired photos!!
-	path = 'FeaturePoints/img1_img2_matches.npz'
+	path = 'feature_points/img1_img2_matches.npz'
 	npz = np.load(path)
 	npz.files
 	['keypoints0', 'keypoints1', 'matches', 'match_confidence']
