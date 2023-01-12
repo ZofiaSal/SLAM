@@ -13,10 +13,13 @@ What even is here ?
 *feature_points*
 
 *first_dataset*
+
 Set of photos made for testing image_processing and potentially in future also out slam.
 
 *images_prev*
+
 Script for getting intrinsic and distortion of camera based on Charuko photos . 
 
 *robot_connecting*
+
 Low level stuff for getting info from robot and moving it.
