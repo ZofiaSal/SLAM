@@ -16,7 +16,7 @@ What even is here ?
 
 *first_dataset*
 
-Set of photos made for testing image_processing and potentially in future also out slam.
+Set of photos made for testing image_processing and potentially in future also for slam.
 
 *images_prev*
 

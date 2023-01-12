@@ -34,7 +34,7 @@ def getRotationsInXY(angle):
 # distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where a lpha is rotation in XY
 def calculatePoints3D(points1, points2, distance):
     
-    #calculate extrinsic matrix
+    # Calculate extrinsic matrixes.
     rotation1 = np.identity(4, dtype = np.float64)
     rotation1[:3, :3] = getRotationsInXY(-distance[2]) # with minus ?
     rotation2 = np.identity(4, dtype = np.float64)
@@ -46,13 +46,14 @@ def calculatePoints3D(points1, points2, distance):
     extrinsic1 = np.linalg.inv(rotation1 @ translation1)
     extrinsic2 = np.linalg.inv(rotation2 @ translation2)
 
-    # remove last row of Extrinsic -> (3,4)
+    # Remove last row of Extrinsic -> (3,4).
     extrinsic1 = extrinsic1[:-1, :]
     extrinsic2 = extrinsic2[:-1, :]
 
     projectionMatrix1 = intrinsic @ extrinsic1
     projectionMatrix2 = intrinsic @ extrinsic2
 
+    # TODO: Is that even needed?
     points_undist1 = cv2.undistortPoints(points1.astype(np.float64), intrinsic, distortion)
     points_undist2 = cv2.undistortPoints(points2.astype(np.float64), intrinsic, distortion)
     
