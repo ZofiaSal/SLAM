@@ -9,15 +9,21 @@ import pickle
 import glob
 
 
+# Updated the file to be compatible with the latest version of opencv-contrib-python (4.7.0.68)
+# Use pip install opencv-contrib-python == 4.7.0 
+
+# Folder with photos relative to the folder in which the script is. 
+CHARUCOPICTURES_FOLDER = 'images_of_charuko_from_phone'
+
 # ChAruco board variables
 CHARUCOBOARD_ROWCOUNT = 7
 CHARUCOBOARD_COLCOUNT = 5 
-ARUCO_DICT = aruco.Dictionary_get(aruco.DICT_4X4_1000)
+ARUCO_DICT = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
+
 
 # Create constants to be passed into OpenCV and Aruco methods
-CHARUCO_BOARD = aruco.CharucoBoard_create(
-        squaresX=CHARUCOBOARD_COLCOUNT,
-        squaresY=CHARUCOBOARD_ROWCOUNT,
+CHARUCO_BOARD = aruco.CharucoBoard(
+        size=(CHARUCOBOARD_COLCOUNT, CHARUCOBOARD_ROWCOUNT),
         squareLength=0.018,
         markerLength=0.014,
         dictionary=ARUCO_DICT)
@@ -32,7 +38,7 @@ image_size = None # Determined at runtime
 # I'm using a set of images taken with the camera with the naming convention:
 # 'camera-pic-of-charucoboard-<NUMBER>.jpg'
 # All images used should be the same size, which if taken with the same camera shouldn't be a problem
-images = glob.glob('./*.jpg')
+images = glob.glob('./'+CHARUCOPICTURES_FOLDER+'/*.jpeg')
 
 # Loop through images glob'ed
 for iname in images:
