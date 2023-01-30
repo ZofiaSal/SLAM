@@ -22,7 +22,7 @@ To execute `match_pairs.py` script clone SuperGlue repo and run:
 path_image_A path_image_B 
 ```
 "
-Example in `assets/phototourism_test_pairs.txt` in SuperGlue repository
+Example in `assets/phototourism_test_pairs.txt` in SuperGlue repository.
 
 ## References
 
