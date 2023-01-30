@@ -18,7 +18,7 @@ What even is here ?
 
 Set of photos made for testing image_processing and potentially in future also for slam.
 
-*images_prev*
+*camera_calibration*
 
 Script for getting intrinsic and distortion of camera based on Charuko photos . 
 
