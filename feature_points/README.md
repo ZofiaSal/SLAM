@@ -16,6 +16,14 @@ To execute `match_pairs.py` script clone SuperGlue repo and run:
 
 `./match_pairs.py --input_dir dir_with_images_to_compare --output_dir path_to_dump_match_pairs_dir`
 
+"You can provide your own list of pairs `--input_pairs` for images contained in `--input_dir`. [...] Each line corresponds to one pair and is structured as follows:
+
+```
+path_image_A path_image_B 
+```
+"
+Example in `assets/phototourism_test_pairs.txt` in SuperGlue repository
+
 ## References
 
 https://sourishghosh.com/2016/fundamental-matrix-from-camera-matrices/

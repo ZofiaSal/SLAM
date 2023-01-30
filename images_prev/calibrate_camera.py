@@ -24,8 +24,8 @@ ARUCO_DICT = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
 # Create constants to be passed into OpenCV and Aruco methods
 CHARUCO_BOARD = aruco.CharucoBoard(
         size=(CHARUCOBOARD_COLCOUNT, CHARUCOBOARD_ROWCOUNT),
-        squareLength=0.018,
-        markerLength=0.014,
+        squareLength=0.0285,    #meters
+        markerLength=0.023,     #meters
         dictionary=ARUCO_DICT)
 
 # Create the arrays and variables we'll use to store info like corners and IDs from images processed
@@ -38,7 +38,7 @@ image_size = None # Determined at runtime
 # I'm using a set of images taken with the camera with the naming convention:
 # 'camera-pic-of-charucoboard-<NUMBER>.jpg'
 # All images used should be the same size, which if taken with the same camera shouldn't be a problem
-images = glob.glob('./'+CHARUCOPICTURES_FOLDER+'/*.jpeg')
+images = glob.glob('./' + CHARUCOPICTURES_FOLDER + '/*.jpeg')
 
 # Loop through images glob'ed
 for iname in images:

@@ -12,12 +12,19 @@ import find_matches_with_superglue as matches
 # distortion = np.matrix([[ 7.46597504e-01,  7.89619631e+01, -2.26703831e-02,  1.18290186e-01,
 #   -3.06426901e+03]], dtype = np.float64)
 
-intrinsic = np.matrix([[915.18878362,   0.,         239.58328874],
- [  0.,         911.09442479, 194.90084703],
- [  0.,          0.,           1.        ]], dtype = np.float64)
+#intrinsic = np.matrix([[915.18878362,   0.,         239.58328874],
+# [  0.,         911.09442479, 194.90084703],
+# [  0.,          0.,           1.        ]], dtype = np.float64)
 
-distortion = np.matrix([[-4.36931096e-01,  2.52126992e+00, -7.28634641e-03, -5.15932592e-03,
-  -2.62649369e+01]], dtype = np.float64)
+#distortion = np.matrix([[-4.36931096e-01,  2.52126992e+00, -7.28634641e-03, -5.15932592e-03,
+#  -2.62649369e+01]], dtype = np.float64)
+
+intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
+ [0.00000000e+00, 3.27559539e+03, 1.35368028e+03],
+ [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]], dtype = np.float64)
+
+distortion = np.matrix([[ 2.46232395e-01, -2.44055557e+00, -2.25038168e-02, -1.39744208e-03,
+   5.37815833e+00]], dtype = np.float64)
 
 def getRotationsInXY(angle):
     Rz = np.zeros(shape = (3, 3))

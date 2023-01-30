@@ -2,7 +2,7 @@ import numpy as np
 
 def find_matches():
 
-	#Change depending on desired photos!!
+	# Change depending on desired photos!!
 	path = 'feature_points/img1_img2_matches.npz'
 	npz = np.load(path)
 	npz.files
