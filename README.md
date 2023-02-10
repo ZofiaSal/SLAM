@@ -12,7 +12,7 @@ What even is here ?
 
 *feature_points*
 
-
+TODO : clean it (feature_points/find_fundamental.py = ./find_matches_with_superglue.py ) 
 
 *first_dataset*
 
@@ -25,3 +25,4 @@ Script for getting intrinsic and distortion of camera based on Charuko photos .
 *robot_connecting*
 
 Low level stuff for getting info from robot and moving it.
+

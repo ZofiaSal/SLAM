@@ -1,23 +1,10 @@
+from cmath import pi
 from gettext import translation
 import numpy as np
 import cv2
 import find_matches_with_superglue as matches
 
-#Prepared beforehand with script images_prev/calibrate_camera.py and photos from images_prev:
-
-# intrinsic = np.matrix([[1.10137417e+03, 0.00000000e+00, 2.89506647e+02],
-#  [0.00000000e+00, 1.07474733e+03, 1.84718234e+02],
-#  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]],dtype = np.float64)
-
-# distortion = np.matrix([[ 7.46597504e-01,  7.89619631e+01, -2.26703831e-02,  1.18290186e-01,
-#   -3.06426901e+03]], dtype = np.float64)
-
-#intrinsic = np.matrix([[915.18878362,   0.,         239.58328874],
-# [  0.,         911.09442479, 194.90084703],
-# [  0.,          0.,           1.        ]], dtype = np.float64)
-
-#distortion = np.matrix([[-4.36931096e-01,  2.52126992e+00, -7.28634641e-03, -5.15932592e-03,
-#  -2.62649369e+01]], dtype = np.float64)
+#Prepared beforehand with script camera_calibration/calibrate_camera.py and photos from photos_made_by_robot_from_phone:
 
 intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
  [0.00000000e+00, 3.27559539e+03, 1.35368028e+03],
@@ -25,6 +12,23 @@ intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
 
 distortion = np.matrix([[ 2.46232395e-01, -2.44055557e+00, -2.25038168e-02, -1.39744208e-03,
    5.37815833e+00]], dtype = np.float64)
+
+# Change depending on desired photos!!
+# This is the output of SuperGlue
+PATHS = ['photos_made_by_robot_from_phone/IMG_1_1_IMG_1_2_matches.npz',     # first movement
+         'photos_made_by_robot_from_phone/IMG_2_1_IMG_2_2_matches.npz',     # first movement second series of pictures 
+         'photos_made_by_robot_from_phone/IMG_2_2_IMG_2_3_matches.npz']     # second movement second series of pictures 
+
+# Change depending on movement !!
+ROTATION = -(pi * 45)/180   # in radians
+XMOVEMENT = 0.046           # in meters
+YMOVEMENT = 0.392           # in meters
+
+MOVEMENTS = [[XMOVEMENT, YMOVEMENT, ROTATION],
+            [XMOVEMENT, YMOVEMENT, ROTATION],
+            [0.071, -40.6, (pi * 45/2)/180 ]]
+
+
 
 def getRotationsInXY(angle):
     Rz = np.zeros(shape = (3, 3))
@@ -36,14 +40,15 @@ def getRotationsInXY(angle):
     
     return Rz
 
+# returned values set the 2 photo in the center of observation
 # points1 - characteristic points from first picture 
 # points2 - characteristic points for corresponding points from picture two
-# distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where a lpha is rotation in XY
+# distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a rotation in XY
 def calculatePoints3D(points1, points2, distance):
     
     # Calculate extrinsic matrixes.
     rotation1 = np.identity(4, dtype = np.float64)
-    rotation1[:3, :3] = getRotationsInXY(-distance[2]) # with minus ?
+    rotation1[:3, :3] = getRotationsInXY(-distance[2])  # TODO with minus ?
     rotation2 = np.identity(4, dtype = np.float64)
 
     translation1 = np.identity(4, dtype = np.float64)
@@ -53,6 +58,7 @@ def calculatePoints3D(points1, points2, distance):
     extrinsic1 = np.linalg.inv(rotation1 @ translation1)
     extrinsic2 = np.linalg.inv(rotation2 @ translation2)
 
+
     # Remove last row of Extrinsic -> (3,4).
     extrinsic1 = extrinsic1[:-1, :]
     extrinsic2 = extrinsic2[:-1, :]
@@ -60,22 +66,25 @@ def calculatePoints3D(points1, points2, distance):
     projectionMatrix1 = intrinsic @ extrinsic1
     projectionMatrix2 = intrinsic @ extrinsic2
 
-    # TODO: Is that even needed?
+    # TODO: Is that even needed? -> nope, doesnt work 
     points_undist1 = cv2.undistortPoints(points1.astype(np.float64), intrinsic, distortion)
     points_undist2 = cv2.undistortPoints(points2.astype(np.float64), intrinsic, distortion)
     
-    print(points_undist1)
-    print(points_undist2)
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
 
     
 
 def main():
-    (points1, points2) = matches.find_matches()
-    print(points1, points2)
-    X = calculatePoints3D(points1[:10,:],points2[:10,:],[5.0,0.0,0.0])
-    X = cv2.convertPointsFromHomogeneous(X.T)
-    print(X)
+    HOW_MANY_POINTS = 20
+
+    for i in range(len(PATHS)): 
+        print(PATHS[i])
+        (points1, points2) = matches.find_matches(PATHS[i])
+        print(points1[:HOW_MANY_POINTS,:],"\n", points2[:HOW_MANY_POINTS,:])
+
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:],MOVEMENTS[i])
+        X = cv2.convertPointsFromHomogeneous(X.T)
+        print(np.round(X,2))
 
 
 if __name__ == '__main__':

@@ -1,9 +1,9 @@
 import numpy as np
 
-def find_matches():
+# Read feature_points/README.md
 
-	# Change depending on desired photos!!
-	path = 'feature_points/img1_img2_matches.npz'
+def find_matches(path):
+
 	npz = np.load(path)
 	npz.files
 	['keypoints0', 'keypoints1', 'matches', 'match_confidence']

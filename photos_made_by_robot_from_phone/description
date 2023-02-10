@@ -1,0 +1,7 @@
+This folder contains two seriese of photos made with my phone.
+First serie IMG_1_1, IMG_1_2 -> with the movement [ x = 0.046, y = 0.392 ,alpha = -(pi * 45)/180 ]
+Second serie IMG_2_1, IMG_2_2, IMG_2,3 -> with the movements respectevely:
+    IMG_2_1 -> IMG_2_2: [ x = 0.046, y = 0.392 ,alpha = -(pi * 45)/180 ] (same as above) 
+    IMG_2_2 -> IMG_2_3: [ x = 0.071, y = -40.6 ,alpha = (pi * 45/2)/180 ]
+
+_b at the end of the file is just a second picture taken in the exact same position.

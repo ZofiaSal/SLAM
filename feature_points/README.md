@@ -24,6 +24,10 @@ path_image_A path_image_B
 "
 Example in `assets/phototourism_test_pairs.txt` in SuperGlue repository.
 
+`--viz` -> outputs a visualisation of those pairs 
+
+`--resize -1` -> for not changing the size of the pictures!!
+
 ## References
 
 https://sourishghosh.com/2016/fundamental-matrix-from-camera-matrices/
