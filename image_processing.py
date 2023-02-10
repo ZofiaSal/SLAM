@@ -5,7 +5,6 @@ import cv2
 import find_matches_with_superglue as matches
 
 #Prepared beforehand with script camera_calibration/calibrate_camera.py and photos from photos_made_by_robot_from_phone:
-
 intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
  [0.00000000e+00, 3.27559539e+03, 1.35368028e+03],
  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]], dtype = np.float64)
@@ -14,7 +13,7 @@ distortion = np.matrix([[ 2.46232395e-01, -2.44055557e+00, -2.25038168e-02, -1.3
    5.37815833e+00]], dtype = np.float64)
 
 # Change depending on desired photos!!
-# This is the output of SuperGlue
+# This is the output of SuperGlue (description how to get its: feature_points/README.md)
 PATHS = ['photos_made_by_robot_from_phone/IMG_1_1_IMG_1_2_matches.npz',     # first movement
          'photos_made_by_robot_from_phone/IMG_2_1_IMG_2_2_matches.npz',     # first movement second series of pictures 
          'photos_made_by_robot_from_phone/IMG_2_2_IMG_2_3_matches.npz']     # second movement second series of pictures 
