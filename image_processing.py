@@ -38,6 +38,9 @@ def getRotationsInXY(angle):
     Rz[2, 2] = 1
     
     return Rz
+    
+
+
 
 # returned values set the 2 photo in the center of observation
 # points1 - characteristic points from first picture 
