@@ -38,9 +38,6 @@ def getRotationsInXY(angle):
     Rz[2, 2] = 1
     
     return Rz
-    
-
-
 
 # returned values set the 2 photo in the center of observation
 # points1 - characteristic points from first picture 
@@ -74,8 +71,6 @@ def calculatePoints3D(points1, points2, distance):
     
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
 
-    
-
 def main():
     HOW_MANY_POINTS = 20
 
@@ -87,7 +82,6 @@ def main():
         X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:],MOVEMENTS[i])
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(np.round(X,2))
-
 
 if __name__ == '__main__':
     main()

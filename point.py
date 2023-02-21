@@ -12,6 +12,9 @@ class Point:
         self.x = x
         self.y = y
         self.z = z 
+    
+    def fromArray(self, coords):
+        return Point( coords[0], coords[1], coords[2])
 
     # For tests.
     def __eq__(self, other):
@@ -29,6 +32,9 @@ class Point:
     def __length(self):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
+    def toArray(self):
+        return [self.x, self.y, self.z]
+
     # The center of coordinate system moves to the point [xMovement, yMovement, zMovement] .
     def changeOriginByTranslation(self, xMovement, yMovement, zMovement = 0):
         self.x = self.x - xMovement
@@ -42,11 +48,10 @@ class Point:
         y0 = self.y
         self.x =  np.cos(rotation) * x0 - np.sin(rotation) * y0
         self.y =  np.sin(rotation) * x0 + np.cos(rotation) * y0
-       
-
-    # First happens the translation and then the rotation(in radians).
-    # movement = [xMovement, yMovement, rotationXY].
+          
+    # movement = [xMovement, yMovement, rotationXY(clockwise in radians)].
     def changeOriginByMovementInXY(self, movement):
+        # First happens the translation and then the rotation so that rotation wouldn't change the coordinate system.
         self.changeOriginByTranslation(movement[0], movement[1])
         self.changeOriginByRotationInXY(movement[2])
 
