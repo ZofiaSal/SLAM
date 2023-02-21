@@ -1,2 +1,1 @@
-SuperGlue repo https://github.com/magicleap/SuperGluePretrainedNetwork more in feature_points/README.md
-OpenCV at least 4.7 (pip install opencv-contrib-python == 4.7.0)
+opencv-contrib-python>=4.7.0
