@@ -83,8 +83,7 @@ class PointTest:
         assert(point.y == -translation[1])
 
 def main():
-    test = PointTest()
-    test.run()
+    PointTest().run()
 
 if __name__ == '__main__':
     main()

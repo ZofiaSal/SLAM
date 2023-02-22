@@ -43,6 +43,7 @@ def getRotationsInXY(angle):
 # points1 - characteristic points from first picture 
 # points2 - characteristic points for corresponding points from picture two
 # distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a rotation in XY
+# based on https://github.com/wingedrasengan927/Image-formation-and-camera-calibration
 def calculatePoints3D(points1, points2, distance):
     
     # Calculate extrinsic matrixes.
@@ -70,6 +71,35 @@ def calculatePoints3D(points1, points2, distance):
     points_undist2 = cv2.undistortPoints(points2.astype(np.float64), intrinsic, distortion)
     
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
+
+
+
+# points1 - characteristic points from first picture 
+# points2 - characteristic points for corresponding points from picture two
+# distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a clockwise rotation in XY
+def calculatePoints3DSECOND(points1, points2, distance, intrinsicCamera = intrinsic):
+    
+    # Calculate extrinsic matrixes.
+    extrinsic1 = np.identity(4, dtype = np.float64)[:-1, :]
+    # Remove last row of Extrinsic -> (3,4).
+    extrinsic1 = extrinsic1[:-1, :]
+
+    extrinsic2 = getExtrinsic(distance)
+    projectionMatrix1 = intrinsicCamera @ extrinsic1
+    projectionMatrix2 = intrinsicCamera @ extrinsic2
+    
+    return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
+
+# distance - the change from center of coordinate system [x,y,alpha] where alpha is a clockwise rotation in XY
+def getExtrinsic(distance):
+    rotation = np.identity(4, dtype = np.float64)
+    rotation[:3, :3] = getRotationsInXY(distance[2])
+    translation = np.identity(4, dtype = np.float64)
+    translation[:2, 3] =[value * -1 for value in distance] [:2]
+
+    return rotation @ translation
+
+
 
 def main():
     HOW_MANY_POINTS = 20

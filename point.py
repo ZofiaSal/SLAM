@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import cv2
 
  # Otherwise tests with unreal numbers won't work.
 def equalWithRound(x, y):
@@ -13,8 +14,13 @@ class Point:
         self.y = y
         self.z = z 
     
-    def fromArray(self, coords):
+    def fromArray(coords):
         return Point( coords[0], coords[1], coords[2])
+
+    def fromNumpyMatrixHomogeneous(pointH):
+        point = cv2.convertPointsFromHomogeneous(pointH)[0][0]
+        return Point.fromArray(point)
+
 
     # For tests.
     def __eq__(self, other):
