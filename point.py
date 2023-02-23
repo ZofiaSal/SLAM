@@ -2,7 +2,7 @@ import numpy as np
 import math
 import cv2
 
- # Otherwise tests with unreal numbers won't work.
+# Otherwise tests with unreal numbers won't work.
 def equalWithRound(x, y):
     return round(x, 10) ==  round(y, 10)
 
@@ -32,7 +32,7 @@ class Point:
     def __str__(self):
         return "( " + str(self.x) + ", " + str(self.y) + ", " + str(self.z)+ " )"
 
-    def egualLength(self, other):
+    def equalLength(self, other):
         return equalWithRound(self.__length(), other.__length())
 
     def __length(self):
@@ -41,21 +41,21 @@ class Point:
     def toArray(self):
         return [self.x, self.y, self.z]
 
-    # The center of coordinate system moves to the point [xMovement, yMovement, zMovement] .
+    # The center of coordinate system moves to the point [xMovement, yMovement, zMovement].
     def changeOriginByTranslation(self, xMovement, yMovement, zMovement = 0):
         self.x = self.x - xMovement
         self.y = self.y - yMovement 
         self.z = self.z - zMovement
 
-    # The center of coordinate system rotates clockwise (in XY plane) with an angle rotation (in radians).
+    # The center of coordinate system rotates COUNTERCLOCKWISE (in XY plane) with an angle rotation (in radians).
     # Source: https://en.wikipedia.org/wiki/Rotation_of_axes
     def changeOriginByRotationInXY(self, rotation):
         x0 = self.x
         y0 = self.y
-        self.x =  np.cos(rotation) * x0 - np.sin(rotation) * y0
-        self.y =  np.sin(rotation) * x0 + np.cos(rotation) * y0
+        self.x =  np.cos(rotation) * x0 + np.sin(rotation) * y0
+        self.y =  - np.sin(rotation) * x0 + np.cos(rotation) * y0
           
-    # movement = [xMovement, yMovement, rotationXY(clockwise in radians)].
+    # movement = [xMovement, yMovement, rotationXY(COUNTERCLOCKWISE in radians)].
     def changeOriginByMovementInXY(self, movement):
         # First happens the translation and then the rotation so that rotation wouldn't change the coordinate system.
         self.changeOriginByTranslation(movement[0], movement[1])

@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 import find_matches_with_superglue as matches
 
-#Prepared beforehand with script camera_calibration/calibrate_camera.py and photos from photos_made_by_robot_from_phone:
+# Prepared beforehand with script camera_calibration/calibrate_camera.py and photos from photos_made_by_robot_from_phone:
 intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
  [0.00000000e+00, 3.27559539e+03, 1.35368028e+03],
  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]], dtype = np.float64)
@@ -39,11 +39,11 @@ def getRotationsInXY(angle):
     
     return Rz
 
-# returned values set the 2 photo in the center of observation
-# points1 - characteristic points from first picture 
-# points2 - characteristic points for corresponding points from picture two
-# distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a rotation in XY
-# based on https://github.com/wingedrasengan927/Image-formation-and-camera-calibration
+# # returned values set the 2 photo in the center of observation
+# # points1 - characteristic points from first picture 
+# # points2 - characteristic points for corresponding points from picture two
+# # distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a rotation in XY
+# # based on https://github.com/wingedrasengan927/Image-formation-and-camera-calibration
 def calculatePoints3D(points1, points2, distance):
     
     # Calculate extrinsic matrixes.
@@ -72,14 +72,34 @@ def calculatePoints3D(points1, points2, distance):
     
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
 
+K = np.array([
+    [1000, 0, 0],
+    [0, 1000, 0],
+    [0, 0, 1]])
 
+def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
+    angle = distance[2]
+    extrinsicCamera1 = [[1, 0, 0, 0],
+                        [0, 1, 0, 0],
+                        [0, 0, 1, 0]]
 
-# points1 - characteristic points from first picture 
-# points2 - characteristic points for corresponding points from picture two
-# distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a clockwise rotation in XY
+    extrinsicCamera2 = [[np.cos(angle), np.sin(angle), 0, -distance[0]],
+                        [- np.sin(angle), np.cos(angle), 0, -distance[1]],
+                        [0, 0, 1, 0]]
+
+    projectionMatrix1 = intrinsicCamera @ extrinsicCamera1
+    projectionMatrix2 = intrinsicCamera @ extrinsicCamera2
+
+    return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
+
+    
+
+# # points1 - characteristic points from first picture 
+# # points2 - characteristic points for corresponding points from picture two
+# # distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a clockwise rotation in XY
 def calculatePoints3DSECOND(points1, points2, distance, intrinsicCamera = intrinsic):
     
-    # Calculate extrinsic matrixes.
+    # Calculate extrinsic matrices.
     extrinsic1 = np.identity(4, dtype = np.float64)[:-1, :]
     # Remove last row of Extrinsic -> (3,4).
 
@@ -89,12 +109,12 @@ def calculatePoints3DSECOND(points1, points2, distance, intrinsicCamera = intrin
     
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
 
-# distance - the change from center of coordinate system [x,y,alpha] where alpha is a clockwise rotation in XY
+# # distance - the change from center of coordinate system [x,y,alpha] where alpha is a COUNTERCLOCKWISE rotation in XY
 def getExtrinsic(distance):
     rotation = np.identity(4, dtype = np.float64)
-    rotation[:3, :3] = getRotationsInXY(distance[2])
+    rotation[:3, :3] = getRotationsInXY(-distance[2])
     translation = np.identity(4, dtype = np.float64)
-    translation[:2, 3] =[value * -1 for value in distance] [:2]
+    translation[:2, 3] = [value * -1 for value in distance][:2]
 
     return rotation @ translation
 
