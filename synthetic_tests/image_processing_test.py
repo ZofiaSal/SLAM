@@ -11,7 +11,7 @@ import point as pt
 class calculatePoints3DTest:
     def run(self):
         self.simpleTest()
-        print("passed simpleTest")
+        print("Passed simpleTest")
     
     def simpleTest(self):
         exampleIntrinsic =np.matrix([[542.517, 0.0, 239.5],[0, 542.517, 319.4],[0, 0, 1]])
@@ -26,9 +26,9 @@ class calculatePoints3DTest:
 class getExtrinsicTest:
     def run(self):
         self.simpleTestMovementToThePoint()
-        print("passed simpleTestMovementToThePoint")
+        print("Passed simpleTestMovementToThePoint")
         self.testWithPointImpl()
-        print("passed testWithPointImpl")
+        print("Passed testWithPointImpl")
     
     def simpleTestMovementToThePoint(self):
         pointBefore = np.matrix([1, 1, 1, 1]).T 
@@ -45,14 +45,14 @@ class getExtrinsicTest:
         assert(pointAfter2 == pt.Point.fromNumpyMatrixHomogeneous(np.matrix([0, 0, 1, 1])))
 
     def testWithPointImpl(self):
-        # TODO: Add more tests ?
+        # TODO: Add more tests?
         pointBefore = np.matrix([1, 1, 1, 1])
         point = pt.Point.fromNumpyMatrixHomogeneous(pointBefore)
         movement = [1, 5, 7]
         extrinsic = imgpr.getExtrinsic(movement)
         pointAfter = pt.Point.fromNumpyMatrixHomogeneous((extrinsic @ pointBefore.T).T)
         point.changeOriginByMovementInXY(movement)
-        assert(pointAfter == point )
+        assert(pointAfter == point)
 
 
 

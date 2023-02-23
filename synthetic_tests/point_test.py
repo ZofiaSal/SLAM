@@ -13,16 +13,18 @@ class PointTest:
         print("passed onlyRotationTest")
         self.fullMovementTest()
         print ("passed fullMovementTest")
+        self.fullMovementSimpleTest()
+        print ("passed fullMovementSimpleTest")
 
     def fullMovementTest(self):
         # The point with the center and Y creates a triangle 45, 45, 90.
         point = pt.Point(1,1,0)
-        point.changeOriginByMovementInXY([0,0,pi/4])
+        point.changeOriginByMovementInXY([0,0,-pi/4])
         point.changeOriginByMovementInXY([0,math.sqrt(2),0])
         assert(point == pt.Point(0,0,0))
 
         point = pt.Point(1,1,5)
-        point.changeOriginByMovementInXY([2,0,-pi/2])
+        point.changeOriginByMovementInXY([2,0,pi/2])
         assert(point == pt.Point(1,1,5))
 
     # Only rotating around the center of coordinate system. 
@@ -33,15 +35,15 @@ class PointTest:
 
         # The point with the cetner and Y creates a triangle 45, 45, 90.
         point = pt.Point(1,1,4)
-        point.changeOriginByRotationInXY(pi/4)
+        point.changeOriginByRotationInXY(-pi/4)
         assert( point == pt.Point(0,math.sqrt(2),4))
 
         # Length of a vector should stay the same after rotations.
         point1 = pt.Point(12,23,78)
         point2 = copy.copy(point1)
         for angle in [1,4,6,7,2,10,12]:
-            point2.changeOriginByRotationInXY(angle)
-            assert(point1.egualLength(point2))
+            point2.changeOriginByRotationInXY(-angle)
+            assert(point1.equalLength(point2))
 
     # Sum of rotations angles1 is equal to the sum of rotations angles2.
     def __equalRotations(self, angles1, angles2, pointStart):
@@ -55,6 +57,27 @@ class PointTest:
             point2.changeOriginByRotationInXY(angle)
 
         assert(point1 == point2)
+
+    def fullMovementSimpleTest(self):
+        point = pt.Point(0, 1, 0)
+        point.changeOriginByMovementInXY([0, 0, -pi/2])
+        assert(point == pt.Point(-1, 0, 0))
+
+        point = pt.Point(1, 1, 0)
+        point.changeOriginByMovementInXY([1, 0, pi/2])
+        assert(point == pt.Point(1, 0, 0))
+
+        point = pt.Point(1, 1, 0)
+        point.changeOriginByMovementInXY([1, 0, -pi/2])
+        assert(point == pt.Point(-1, 0, 0))
+        
+        point = pt.Point(1, 1, 0)
+        point.changeOriginByMovementInXY([0, 1, -pi/2])
+        assert(point == pt.Point(0, 1, 0))
+
+        point = pt.Point(1, 1, 0)
+        point.changeOriginByMovementInXY([0, 2, -pi/2])
+        assert(point == pt.Point(1, 1, 0))
 
     def onlyTranslationTest(self):
         translations = [[1,1], [-5,-7], [-3,7], [0,0]]
