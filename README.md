@@ -36,3 +36,6 @@ Script for getting intrinsic and distortion of camera based on Charuko photos .
 
 Low level stuff for getting info from robot and moving it.
 
+*synthetic_tests/*
+
+All tests, to run use make test
