@@ -13,7 +13,14 @@ class calculatePoints3DTest:
         self.simpleTest()
         print("passed simpleTest")
     
-    #def simpleTest(self):
+    def simpleTest(self):
+        exampleIntrinsic =np.matrix([[542.517, 0.0, 239.5],[0, 542.517, 319.4],[0, 0, 1]])
+        
+        movement = [3, 2, 0]
+        pointsBefore = np.array([[239.5, 319.5]])
+        pointsAfter = np.array([[0, 319.5]])
+        result = imgpr.calculatePoints3DSECOND( pointsBefore, pointsAfter, movement, exampleIntrinsic)
+        print(cv2.convertPointsFromHomogeneous(result.T))
 
 
 class getExtrinsicTest:
@@ -50,7 +57,7 @@ class getExtrinsicTest:
 
 
 def main():
-    #calculatePoints3DTest().run()
+    calculatePoints3DTest().run()
     getExtrinsicTest().run()
     
 

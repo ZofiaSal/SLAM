@@ -82,9 +82,8 @@ def calculatePoints3DSECOND(points1, points2, distance, intrinsicCamera = intrin
     # Calculate extrinsic matrixes.
     extrinsic1 = np.identity(4, dtype = np.float64)[:-1, :]
     # Remove last row of Extrinsic -> (3,4).
-    extrinsic1 = extrinsic1[:-1, :]
 
-    extrinsic2 = getExtrinsic(distance)
+    extrinsic2 = getExtrinsic(distance)[:-1, :]
     projectionMatrix1 = intrinsicCamera @ extrinsic1
     projectionMatrix2 = intrinsicCamera @ extrinsic2
     
