@@ -27,51 +27,6 @@ MOVEMENTS = [[XMOVEMENT, ZMOVEMENT, ROTATION],
             [XMOVEMENT, ZMOVEMENT, ROTATION],
             [0.071, -40.6, (pi * 45/2)/180 ]]
 
-
-
-def getRotationsInXY(angle):
-    Rz = np.zeros(shape = (3, 3))
-    Rz[0, 0] = np.cos(angle)
-    Rz[0, 1] = -np.sin(angle)
-    Rz[1, 0] = np.sin(angle)
-    Rz[1, 1] = np.cos(angle)
-    Rz[2, 2] = 1
-    
-    return Rz
-
-# # returned values set the 2 photo in the center of observation
-# # points1 - characteristic points from first picture 
-# # points2 - characteristic points for corresponding points from picture two
-# # distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a rotation in XY
-# # based on https://github.com/wingedrasengan927/Image-formation-and-camera-calibration
-def calculatePoints3D(points1, points2, distance):
-    
-    # Calculate extrinsic matrixes.
-    rotation1 = np.identity(4, dtype = np.float64)
-    rotation1[:3, :3] = getRotationsInXY(-distance[2])  # TODO with minus ?
-    rotation2 = np.identity(4, dtype = np.float64)
-
-    translation1 = np.identity(4, dtype = np.float64)
-    translation1[:2, 3] = [value * -1 for value in distance] [:2]
-    translation2 = np.identity(4, dtype = np.float64)
-
-    extrinsic1 = np.linalg.inv(rotation1 @ translation1)
-    extrinsic2 = np.linalg.inv(rotation2 @ translation2)
-
-
-    # Remove last row of Extrinsic -> (3,4).
-    extrinsic1 = extrinsic1[:-1, :]
-    extrinsic2 = extrinsic2[:-1, :]
-
-    projectionMatrix1 = intrinsic @ extrinsic1
-    projectionMatrix2 = intrinsic @ extrinsic2
-
-    # TODO: Is that even needed? -> nope, doesnt work 
-    points_undist1 = cv2.undistortPoints(points1.astype(np.float64), intrinsic, distortion)
-    points_undist2 = cv2.undistortPoints(points2.astype(np.float64), intrinsic, distortion)
-    
-    return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
-
 K = np.array([
     [1000, 0, 0],
     [0, 1000, 0],
@@ -97,43 +52,42 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
 
     
 
-# # points1 - characteristic points from first picture 
-# # points2 - characteristic points for corresponding points from picture two
-# # distance - the change from where picture 1 was taken to where picture 2 was taken [x,y,alpha] where alpha is a clockwise rotation in XY
-def calculatePoints3DSECOND(points1, points2, distance, intrinsicCamera = intrinsic):
-    
-    # Calculate extrinsic matrices.
-    extrinsic1 = np.identity(4, dtype = np.float64)[:-1, :]
-    # Remove last row of Extrinsic -> (3,4).
-
-    extrinsic2 = getExtrinsic(distance)[:-1, :]
-    projectionMatrix1 = intrinsicCamera @ extrinsic1
-    projectionMatrix2 = intrinsicCamera @ extrinsic2
-    
-    return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
-
-# # distance - the change from center of coordinate system [x,y,alpha] where alpha is a COUNTERCLOCKWISE rotation in XY
-def getExtrinsic(distance):
-    rotation = np.identity(4, dtype = np.float64)
-    rotation[:3, :3] = getRotationsInXY(-distance[2])
-    translation = np.identity(4, dtype = np.float64)
-    translation[:2, 3] = [value * -1 for value in distance][:2]
-
-    return rotation @ translation
-
-
-
+# 13.6 -2.7
 def main():
     HOW_MANY_POINTS = 35
 
     for i in range(len(PATHS)): 
-        print(PATHS[i])
-        (points1, points2) = matches.find_matches(PATHS[i])
-        
+        # to jest nadpisywane i tak
+        # print(PATHS[i])
+        # (points1, points2) = matches.find_matches(PATHS[i])
+
+        # points from charuco board measured with gimp on 26.02. The second robot is moving in relation
+        # to the first one: 5cm to the left. Both are in distance of 30cm from the board.
+        # What is wrong? The z value is correct but wrong sign???
+        # The y value is moved(!) by 5cm (sign is correct)
+        # The x value is omved(!) by 4 cm. 
+        # Expected result:
+        # [0.0,   -0.138, 0.30]
+        # [0.085, -0.138, 0.30]
+        # [0.085, -0.11,  0.30]
+        # [0.06,  -0.11,  0.30]
+        # [0.06,  -0.07,  0.30]
+        # [0.029, -0.07,  0.30]
+        # Difference:
+        # [0.04,  -0.051, 0]
+        # [0.044, -0.052, 0.01]
+        # [0.044, -0.053, 0.01]
+        # [0.04,  -0.053, 0]
+        # [0.04,  -0.065, 0]
+        # [0.045, -0.065, 0]
+        points1 = np.array([[1500, 3399], [589,3407], [586, 3110], [881, 3113], [877, 2820], [1173, 2820]])
+        points2 = np.array([[2034, 3390], [1122, 3396], [1119, 3100], [1416, 3104], [1414, 2809], [1710, 2811]])
+        HOW_MANY_POINTS = 6
+
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:],MOVEMENTS[i])
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], [0.05, 0, 0], intrinsic)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
         break
