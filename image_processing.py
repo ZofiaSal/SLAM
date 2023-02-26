@@ -21,10 +21,10 @@ PATHS = ['photos_made_by_robot_from_phone/IMG_1_1_IMG_1_2_matches.npz',     # fi
 # Change depending on movement !!
 ROTATION = -(pi * 45)/180   # in radians
 XMOVEMENT = 0.046           # in meters
-YMOVEMENT = 0.392           # in meters
+ZMOVEMENT = 0.392           # in meters
 
-MOVEMENTS = [[XMOVEMENT, YMOVEMENT, ROTATION],
-            [XMOVEMENT, YMOVEMENT, ROTATION],
+MOVEMENTS = [[XMOVEMENT, ZMOVEMENT, ROTATION],
+            [XMOVEMENT, ZMOVEMENT, ROTATION],
             [0.071, -40.6, (pi * 45/2)/180 ]]
 
 
@@ -77,6 +77,9 @@ K = np.array([
     [0, 1000, 0],
     [0, 0, 1]])
 
+# points1 - characteristic points from first picture 
+# points2 - characteristic points for corresponding points from picture two
+# distance - the change from where picture 1 was taken to where picture 2 was taken [x,z,alpha] where alpha is a clockwise rotation in XY
 def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
     angle = distance[2]
     extrinsicCamera1 = [[1, 0, 0, 0],
@@ -84,8 +87,8 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
                         [0, 0, 1, 0]]
 
     extrinsicCamera2 = [[np.cos(angle), np.sin(angle), 0, -distance[0]],
-                        [- np.sin(angle), np.cos(angle), 0, -distance[1]],
-                        [0, 0, 1, 0]]
+                        [- np.sin(angle), np.cos(angle), 0, 0],
+                        [0, 0, 1, -distance[1]]]
 
     projectionMatrix1 = intrinsicCamera @ extrinsicCamera1
     projectionMatrix2 = intrinsicCamera @ extrinsicCamera2
@@ -121,16 +124,19 @@ def getExtrinsic(distance):
 
 
 def main():
-    HOW_MANY_POINTS = 20
+    HOW_MANY_POINTS = 35
 
     for i in range(len(PATHS)): 
         print(PATHS[i])
         (points1, points2) = matches.find_matches(PATHS[i])
-        print(points1[:HOW_MANY_POINTS,:],"\n", points2[:HOW_MANY_POINTS,:])
+        
+        for j in range(HOW_MANY_POINTS):
+            print(points1[j],"   ", points2[j])
 
         X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:],MOVEMENTS[i])
         X = cv2.convertPointsFromHomogeneous(X.T)
-        print(np.round(X,2))
+        print(X)
+        break
 
 if __name__ == '__main__':
     main()
