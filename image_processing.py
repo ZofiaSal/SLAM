@@ -14,18 +14,24 @@ intrinsic = np.matrix([[3.10055067e+03, 0.00000000e+00, 1.53884049e+03],
 
 # Change depending on desired photos!!
 # This is the output of SuperGlue (description how to get its: feature_points/README.md)
-PATHS = ['photos_made_by_robot_from_phone/IMG_1_1_IMG_1_2_matches.npz',     # first movement
-         'photos_made_by_robot_from_phone/IMG_2_1_IMG_2_2_matches.npz',     # first movement second series of pictures 
-         'photos_made_by_robot_from_phone/IMG_2_2_IMG_2_3_matches.npz']     # second movement second series of pictures 
+# PATHS = ['photos_made_by_robot_from_phone/IMG_1_1_IMG_1_2_matches.npz',     # first movement
+#          'photos_made_by_robot_from_phone/IMG_2_1_IMG_2_2_matches.npz',     # first movement second series of pictures 
+#          'photos_made_by_robot_from_phone/IMG_2_2_IMG_2_3_matches.npz']     # second movement second series of pictures 
 
-# Change depending on movement !!
-ROTATION = -(pi * 45)/180   # in radians
-XMOVEMENT = 0.046           # in meters
-ZMOVEMENT = 0.392           # in meters
+# # Change depending on movement !!
+# ROTATION = -(pi * 45)/180   # in radians
+# ZMOVEMENT = 0.046           # in meters
+# XMOVEMENT = 0.392           # in meters
 
-MOVEMENTS = [[XMOVEMENT, ZMOVEMENT, ROTATION],
-            [XMOVEMENT, ZMOVEMENT, ROTATION],
-            [0.071, -40.6, (pi * 45/2)/180 ]]
+# MOVEMENTS = [[XMOVEMENT, ZMOVEMENT, ROTATION],
+#             [XMOVEMENT, ZMOVEMENT, ROTATION],
+#             [0.071, -40.6, (pi * 45/2)/180 ]]
+
+
+# Movements for photos with charuco
+MOVEMENTS = [[0.05, 0, 0]]
+
+PATHS = ['photos_made_by_phone_testing_2/IMG_1_IMG_2_matches.npz']
 
 K = np.array([
     [1000, 0, 0],
@@ -54,56 +60,35 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
 
 # 13.6 -2.7
 def main():
-    HOW_MANY_POINTS = 35
+    HOW_MANY_POINTS = 47
 
     for i in range(len(PATHS)): 
         # to jest nadpisywane i tak
-        # print(PATHS[i])
-        # (points1, points2) = matches.find_matches(PATHS[i])
+        print(PATHS[i])
+        (points1, points2) = matches.find_matches(PATHS[i])
 
-        # points from charuco board measured with gimp on 26.02. The second robot is moving in relation
-        # to the first one: 5cm to the left. Both are in distance of 30cm from the board.
-        # What is wrong? The z value is correct but wrong sign???
-        # The y value is moved(!) by 5cm (sign is correct)
-        # The x value is omved(!) by 4 cm. 
-        # Expected result:
-        # [0.0,   -0.138, 0.30]
-        # [0.085, -0.138, 0.30]
-        # [0.085, -0.11,  0.30]
-        # [0.06,  -0.11,  0.30]
-        # [0.06,  -0.07,  0.30]
-        # [0.029, -0.07,  0.30]
-        # Difference:
-        # [0.04,  -0.051, 0]
-        # [0.044, -0.052, 0.01]
-        # [0.044, -0.053, 0.01]
-        # [0.04,  -0.053, 0]
-        # [0.04,  -0.065, 0]
-        # [0.045, -0.065, 0]
-        points1 = np.array([[1500, 3399], [589,3407], [586, 3110], [881, 3113], [877, 2820], [1173, 2820]])
-        points2 = np.array([[2034, 3390], [1122, 3396], [1119, 3100], [1416, 3104], [1414, 2809], [1710, 2811]])
-        HOW_MANY_POINTS = 6
-        # [[ 0.04404553 -0.18982083 -0.3046698 ]]
-        # [[ 0.12955368 -0.19080615 -0.30520441]]
-        # [[ 0.1298415  -0.1631898  -0.30522335]]
-        # [[ 0.10179917 -0.16291434 -0.3041004 ]]
-        # [[ 0.10178287 -0.13509803 -0.30293018]]
-        # [[ 0.07423874 -0.13520715 -0.3029675 ]]
+        # # points from charuco board measured with gimp on 26.02. The second robot is moving in relation
+        # # to the first one: 5cm to the left. Both are in distance of 30cm from the board.
+        # points1 = np.array([[1500, 3399], [589,3407], [586, 3110], [881, 3113], [877, 2820], [1173, 2820]])
+        # points2 = np.array([[2034, 3390], [1122, 3396], [1119, 3100], [1416, 3104], [1414, 2809], [1710, 2811]])
+        # HOW_MANY_POINTS = 6
 
-        points1 = np.array([[1003, 3410], [107, 3412], [102, 3121], [392, 3123], [386, 2831], [677, 2834]])
-        points2 = np.array([[2000, 3419], [1093, 3428], [1090, 3135], [1385, 3137], [1383, 2842], [1677, 2844]])
-        HOW_MANY_POINTS = 6
-        # [[ 0.09703354 -0.2053685  -0.32642544]]
-        # [[ 0.18896063 -0.20818205 -0.3300166 ]]
-        # [[ 0.18909123 -0.17841028 -0.32936547]]
-        # [[ 0.15893977 -0.17771208 -0.32770712]]
-        # [[ 0.15891096 -0.14776335 -0.3264138 ]]
-        # [[ 0.12933879 -0.14757115 -0.32544055]]
+        # points1 = np.array([[1003, 3410], [107, 3412], [102, 3121], [392, 3123], [386, 2831], [677, 2834]])
+        # points2 = np.array([[2000, 3419], [1093, 3428], [1090, 3135], [1385, 3137], [1383, 2842], [1677, 2844]])
+        # HOW_MANY_POINTS = 6
+
+        # points1 = np.array([[898, 3208], [105, 3227], [101, 2970], [360, 2968], [355, 2714], [612, 2711]])
+        # points2 = np.array([[2083, 3803], [991, 3815], [988, 3456], [1342, 3460], [1342, 3106], [1695, 3108]])
+        # HOW_MANY_POINTS = 6
+
+        # points1 = np.array([[1003, 3410], [107, 3412], [102, 3121], [392, 3123], [386, 2831], [677, 2834]])
+        # points2 = np.array([[2000, 3419], [1093, 3428], [1090, 3135], [1385, 3137], [1383, 2842], [1677, 2844]])
+        # HOW_MANY_POINTS = 6
 
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], [0.1, 0, 0], intrinsic)
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
         break

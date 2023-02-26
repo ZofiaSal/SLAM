@@ -28,6 +28,11 @@ Example in `assets/phototourism_test_pairs.txt` in SuperGlue repository.
 
 `--resize -1` -> for not changing the size of the pictures!!
 
+`--match_threshold 0.2`  
+
+
+np:
+./SuperGluePretrainedNetwork/match_pairs.py --input_dir ./ --output_dir ./ --input_pairs ./pairs_super_glue.txt --resize -1 --viz --match_threshold 0.6
 ## References
 
 https://sourishghosh.com/2016/fundamental-matrix-from-camera-matrices/
