@@ -64,7 +64,7 @@ def main():
 
     for i in range(len(PATHS)): 
         # to jest nadpisywane i tak
-        print(PATHS[i])
+        #print(PATHS[i])
         (points1, points2) = matches.find_matches(PATHS[i])
 
         # # points from charuco board measured with gimp on 26.02. The second robot is moving in relation
@@ -81,14 +81,15 @@ def main():
         # points2 = np.array([[2083, 3803], [991, 3815], [988, 3456], [1342, 3460], [1342, 3106], [1695, 3108]])
         # HOW_MANY_POINTS = 6
 
-        # points1 = np.array([[1003, 3410], [107, 3412], [102, 3121], [392, 3123], [386, 2831], [677, 2834]])
-        # points2 = np.array([[2000, 3419], [1093, 3428], [1090, 3135], [1385, 3137], [1383, 2842], [1677, 2844]])
-        # HOW_MANY_POINTS = 6
+        points1 = np.array([[899, 3472], [902, 3219], [1141, 3217], [1170, 2887], [1020, 2777], [3777, 2660]])
+        points2 = np.array([[2405, 3513], [2408, 3256], [2662, 3299], [2693, 2956], [2529, 2823], [1902, 2640]])
+        HOW_MANY_POINTS = 6
 
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], [0,0,0.471], intrinsic)
+        #X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
         break

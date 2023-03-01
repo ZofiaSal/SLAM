@@ -2,6 +2,6 @@ This folder contains a serie of photos made with my phone(iphone 11).
 IMG_1, IMG_2 -> with the movement [ x = 0.05, z = 0 ,alpha = 0 ]
 IMG_3, IMG_4 -> with the movement [ x = 0.1, z = 0 ,alpha = 0 ]
 IMG_5, IMG_6 -> with the movement [ x = 0.1, z = 0.1 ,alpha = 0 ]
-IMG_7, IMG_8 -> with the movement [ x = 0, z = 0 ,alpha = 0.471 ]
+IMG_7, IMG_8 -> with the movement [ x = -0.1, z = 0 ,alpha = 0.471 ]
 
 _b at the end of the file is just a second picture taken in the exact same position.
