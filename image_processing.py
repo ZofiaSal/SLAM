@@ -47,9 +47,9 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
                         [0, 1, 0, 0],
                         [0, 0, 1, 0]]
 
-    extrinsicCamera2 = [[np.cos(angle), np.sin(angle), 0, -distance[0]],
-                        [- np.sin(angle), np.cos(angle), 0, 0],
-                        [0, 0, 1, -distance[1]]]
+    extrinsicCamera2 = [[np.cos(angle),     0,      np.sin(angle),  -distance[0]],
+                        [0,                 1,      0,              0           ],
+                        [-np.sin(angle),   0,      np.cos(angle),  -distance[1]]]
 
     projectionMatrix1 = intrinsicCamera @ extrinsicCamera1
     projectionMatrix2 = intrinsicCamera @ extrinsicCamera2
@@ -58,7 +58,6 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
 
     
 
-# 13.6 -2.7
 def main():
     HOW_MANY_POINTS = 47
 
@@ -81,14 +80,14 @@ def main():
         # points2 = np.array([[2083, 3803], [991, 3815], [988, 3456], [1342, 3460], [1342, 3106], [1695, 3108]])
         # HOW_MANY_POINTS = 6
 
-        points1 = np.array([[899, 3472], [902, 3219], [1141, 3217], [1170, 2887], [1020, 2777], [3777, 2660]])
+        points1 = np.array([[1984, 3404], [1990, 3154], [2228, 3153], [2260, 2827], [2109, 2717], [1468, 2595]])
         points2 = np.array([[2405, 3513], [2408, 3256], [2662, 3299], [2693, 2956], [2529, 2823], [1902, 2640]])
         HOW_MANY_POINTS = 6
 
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], [0,0,0.471], intrinsic)
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], [-0.1,0,0.471], intrinsic)
         #X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
