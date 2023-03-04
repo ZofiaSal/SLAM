@@ -2,14 +2,14 @@
 Bachelor's thesis project 
 
 
-What do we need to change :
+What do we need to change:
 
 - abstract out getting controls and observations where each observation is [d,ang,z,i] where d is distance on XY plane, ang is angle between front of a robot and observation, z is the Z coord of landmark and i is and index of landmark.
 
 
 
 
-What even is here ?
+What even is here?
 
 *ekf_slam.py*
 
@@ -39,3 +39,5 @@ Low level stuff for getting info from robot and moving it.
 *synthetic_tests/*
 
 All tests, to run use make test
+
+TODO: info -- how to get npz

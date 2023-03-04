@@ -29,9 +29,20 @@ intrinsic = np.matrix([[3.10055067e+03, 0.00000000e+00, 1.53884049e+03],
 
 
 # Movements for photos with charuco
-MOVEMENTS = [[0.05, 0, 0]]
+# MOVEMENTS = [[0.05, 0, 0]]
+MOVEMENTS = [
+            [-0.05, 0, 0.209],
+            [-0.05, 0.05, 0],
+            [-0.1, -0.05, 0],
+            [-0.1, -0.05, 0],
+            [-0.05, 0.05, 0.227]]
 
-PATHS = ['photos_made_by_phone_testing_2/IMG_1_IMG_2_matches.npz']
+
+#PATHS = ['photos_made_by_phone_testing_2/IMG_1_IMG_2_matches.npz']
+PATHS = ['soup_photos_full_movements/IMG_1_IMG_2_matches.npz',
+        'soup_photos_full_movements/IMG_2_IMG_3_matches.npz', 
+        'soup_photos_full_movements/IMG_3_IMG_4_matches.npz', 
+        'soup_photos_full_movements/IMG_4_IMG_5_matches.npz']
 
 K = np.array([
     [1000, 0, 0],
@@ -47,7 +58,7 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
                         [0, 1, 0, 0],
                         [0, 0, 1, 0]]
 
-    extrinsicCamera2 = [[np.cos(angle),     0,      np.sin(angle),  -distance[0]],
+    extrinsicCamera2 = [[np.cos(angle),     0,       np.sin(angle),  -distance[0]],
                         [0,                 1,      0,              0           ],
                         [-np.sin(angle),   0,      np.cos(angle),  -distance[1]]]
 
@@ -59,11 +70,11 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
     
 
 def main():
-    HOW_MANY_POINTS = 47
+    HOW_MANY_POINTS = 30
 
     for i in range(len(PATHS)): 
         # to jest nadpisywane i tak
-        #print(PATHS[i])
+        print(PATHS[i])
         (points1, points2) = matches.find_matches(PATHS[i])
 
         # # points from charuco board measured with gimp on 26.02. The second robot is moving in relation
@@ -80,18 +91,18 @@ def main():
         # points2 = np.array([[2083, 3803], [991, 3815], [988, 3456], [1342, 3460], [1342, 3106], [1695, 3108]])
         # HOW_MANY_POINTS = 6
 
-        points1 = np.array([[1984, 3404], [1990, 3154], [2228, 3153], [2260, 2827], [2109, 2717], [1468, 2595]])
-        points2 = np.array([[2405, 3513], [2408, 3256], [2662, 3299], [2693, 2956], [2529, 2823], [1902, 2640]])
-        HOW_MANY_POINTS = 6
+        # points1 = np.array([[1984, 3404], [1990, 3154], [2228, 3153], [2260, 2827], [2109, 2717], [1468, 2595]])
+        # points2 = np.array([[2405, 3513], [2408, 3256], [2662, 3299], [2693, 2956], [2529, 2823], [1902, 2640]])
+        # HOW_MANY_POINTS = 6
 
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], [-0.1,0,0.471], intrinsic)
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
         #X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
-        break
+        #  break
 
 if __name__ == '__main__':
     main()
