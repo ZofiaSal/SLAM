@@ -41,3 +41,4 @@ Low level stuff for getting info from robot and moving it.
 All tests, to run use make test
 
 TODO: info -- how to get npz
+TODO: add camera calibration scritp ?
