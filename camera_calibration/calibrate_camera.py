@@ -13,7 +13,7 @@ import glob
 # Use pip install opencv-contrib-python == 4.7.0 
 
 # Folder with photos relative to the folder in which the script is. 
-CHARUCOPICTURES_FOLDER = 'images_of_charuco_from_realsense'
+CHARUCOPICTURES_FOLDER = 'calibration2'
 
 # ChAruco board variables
 CHARUCOBOARD_ROWCOUNT = 7
