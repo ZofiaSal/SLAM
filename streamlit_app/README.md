@@ -2,4 +2,4 @@
 
 How to run?
 
-`streamlit run main`
+`streamlit run main.py`
