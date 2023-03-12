@@ -13,7 +13,7 @@ import glob
 # Use pip install opencv-contrib-python == 4.7.0 
 
 # Folder with photos relative to the folder in which the script is. 
-CHARUCOPICTURES_FOLDER = 'images_of_charuko_from_phone'
+CHARUCOPICTURES_FOLDER = 'images_of_charuco_from_realsense'
 
 # ChAruco board variables
 CHARUCOBOARD_ROWCOUNT = 7
@@ -38,7 +38,7 @@ image_size = None # Determined at runtime
 # I'm using a set of images taken with the camera with the naming convention:
 # 'camera-pic-of-charucoboard-<NUMBER>.jpg'
 # All images used should be the same size, which if taken with the same camera shouldn't be a problem
-images = glob.glob('./' + CHARUCOPICTURES_FOLDER + '/*.jpeg')
+images = glob.glob('./' + CHARUCOPICTURES_FOLDER + '/*.jpg')
 
 # Loop through images glob'ed
 for iname in images:
@@ -58,6 +58,7 @@ for iname in images:
             corners=corners)
 
     # Get charuco corners and ids from detected aruco markers
+    print("Tutaj image: {}".format(iname))
     response, charuco_corners, charuco_ids = aruco.interpolateCornersCharuco(
             markerCorners=corners,
             markerIds=ids,
