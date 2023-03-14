@@ -14,6 +14,9 @@ EXTRINSIC_MATRIX =  [[1, 0, 0, 0],
 # Width of the squared point
 WIDTH = 8
 
+if 'points' not in st.session_state:
+    st.session_state['points'] = []
+
 
 def putPixelOnPhoto( picX, picY, image):
     sizeX = image.width
