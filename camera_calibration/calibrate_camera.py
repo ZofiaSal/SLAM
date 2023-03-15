@@ -13,7 +13,7 @@ import glob
 # Use pip install opencv-contrib-python == 4.7.0 
 
 # Folder with photos relative to the folder in which the script is. 
-CHARUCOPICTURES_FOLDER = 'calibration2'
+CHARUCOPICTURES_FOLDER = 'images_of_charuco_second_attempt_realsense'
 
 # ChAruco board variables
 CHARUCOBOARD_ROWCOUNT = 7
@@ -58,7 +58,7 @@ for iname in images:
             corners=corners)
 
     # Get charuco corners and ids from detected aruco markers
-    print("Tutaj image: {}".format(iname))
+    # print("Tutaj image: {}".format(iname))
     response, charuco_corners, charuco_ids = aruco.interpolateCornersCharuco(
             markerCorners=corners,
             markerIds=ids,
@@ -127,9 +127,9 @@ print(distCoeffs)
     
 # Save values to be used where matrix+dist is required, for instance for posture estimation
 # I save files in a pickle file, but you can use yaml or whatever works for you
-f = open('calibration.pckl', 'wb')
-pickle.dump((cameraMatrix, distCoeffs, rvecs, tvecs), f)
-f.close()
+#f = open('calibration.pckl', 'wb')
+#pickle.dump((cameraMatrix, distCoeffs, rvecs, tvecs), f)
+#f.close()
     
 # Print to console our success
 print('Calibration successful. Calibration file used: {}'.format('calibration.pckl'))
