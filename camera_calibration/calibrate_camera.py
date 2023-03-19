@@ -8,7 +8,6 @@ from cv2 import aruco
 import pickle
 import glob
 
-
 # Updated the file to be compatible with the latest version of opencv-contrib-python (4.7.0.68)
 # Use pip install opencv-contrib-python == 4.7.0 
 
