@@ -7,9 +7,17 @@ INTRINSIC_MATRIX = np.matrix(
  [  0.,         904.78000567, 358.91564315],
  [  0.,           0.,           1.,        ]])
 
+INTRINSIC_MATRIX2 = np.matrix(
+[[932.67418732,   0.,         644.38238907],
+ [  0.,         933.67287344, 350.64539352],
+ [  0.,        0.,           1.        ]])
+
 EXTRINSIC_MATRIX =  [[1, 0, 0, 0],
     [0, 1, 0, 0],
     [0, 0, 1, 0]]
+
+DIST_COEFF = np.matrix([[ 2.71519384e-02,  6.36233261e-01, -1.86960801e-03, -6.39830945e-03,
+  -2.06156958e+00]])
 
 # Width of the squared point
 WIDTH = 8
@@ -40,16 +48,17 @@ def addSaveButton():
         print(st.session_state['points'])
 
 
-projectionMatrix = INTRINSIC_MATRIX.dot(EXTRINSIC_MATRIX)
+projectionMatrix = INTRINSIC_MATRIX2.dot(EXTRINSIC_MATRIX)
 
 # Interactive Streamlit elements, like these sliders, return their value.
 # This gives you an extremely simple interaction model.
-positionX = st.sidebar.slider("Position X", -30, 30, 0, 1)
-positionY = st.sidebar.slider("Position Y", -30, 30, 0, 1)
-positionZ = st.sidebar.slider("Position Z", 10, 100, 30, 1)
+positionX = st.sidebar.slider("Position X", -60, 60, 0, 1)
+positionY = st.sidebar.slider("Position Y", -60, 60, 0, 1)
+positionZ = st.sidebar.slider("Position Z", 50, 300, 100, 1)
 
 # Counting pixel coordinates of the point on the photo
 homogeneous3D = np.matrix([positionX, positionY, positionZ, 1]).T
+print(homogeneous3D)
 homogeneous2D = projectionMatrix * homogeneous3D
 point2D = homogeneous2D[:-1] / homogeneous2D[-1]
 print(point2D)
