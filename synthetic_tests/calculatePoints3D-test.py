@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import sys
 sys.path.append('../')
-import image_processing as imp
+import image_processing.image_processing as imp
 
 translationX = 1.
 translationY = 1.
