@@ -1,2 +1,0 @@
-Directory contains photos of charuco board with: 1.84 cm and 1.5cm.
-The calibration on those photos for some reason is not working.
