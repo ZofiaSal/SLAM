@@ -2,7 +2,7 @@ from cmath import pi
 from gettext import translation
 import numpy as np
 import cv2
-import find_matches_with_superglue as matches
+import image_processing.find_matches_with_superglue as matches
 
 # Prepared beforehand with script camera_calibration/calibrate_camera.py and photos from photos_made_by_robot_from_phone:
 # intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
