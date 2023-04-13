@@ -1,1 +1,0 @@
-./IMG_1.jpeg ./IMG_2.jpeg
