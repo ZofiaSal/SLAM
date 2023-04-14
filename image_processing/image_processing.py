@@ -2,47 +2,40 @@ from cmath import pi
 from gettext import translation
 import numpy as np
 import cv2
-import image_processing.find_matches_with_superglue as matches
 
-# Prepared beforehand with script camera_calibration/calibrate_camera.py and photos from photos_made_by_robot_from_phone:
-# intrinsic = np.matrix([[3.25469171e+03, 0.00000000e+00, 1.97045738e+03],
-#  [0.00000000e+00, 3.27559539e+03, 1.35368028e+03],
-#  [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]], dtype = np.float64)
-intrinsic = np.matrix([[3.10055067e+03, 0.00000000e+00, 1.53884049e+03],
- [0.00000000e+00, 3.09458047e+03, 2.01598760e+03],
- [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]], dtype = np.float64)
+# OUR FINAL CAMERA CALIBRATION MATRIX
+calibration = 0.6442544274536695
+cameraMatrix = np.array([[932.35252209,   0.,         657.24325896],
+ [  0.,         930.23581552, 357.42939289],
+ [  0.,           0.,           1.        ]])
+distCoeffs = np.array([[ 1.76279343e-01, -6.07952723e-01, -4.64176532e-04, -4.96839648e-04, 6.04867450e-01]])
+
+# Change depending on movement !!
+ROTATION = -(pi * 45)/180   # in radians
+ZMOVEMENT = 0.046           # in meters
+XMOVEMENT = 0.392           # in meters
+
+MOVEMENTS = []
+for i in range(12):
+    movement = [XMOVEMENT, ZMOVEMENT, ROTATION]
+    MOVEMENTS.append(movement)
 
 # Change depending on desired photos!!
 # This is the output of SuperGlue (description how to get its: feature_points/README.md)
-# PATHS = ['photos_made_by_robot_from_phone/IMG_1_1_IMG_1_2_matches.npz',     # first movement
-#          'photos_made_by_robot_from_phone/IMG_2_1_IMG_2_2_matches.npz',     # first movement second series of pictures 
-#          'photos_made_by_robot_from_phone/IMG_2_2_IMG_2_3_matches.npz']     # second movement second series of pictures 
-
-# # Change depending on movement !!
-# ROTATION = -(pi * 45)/180   # in radians
-# ZMOVEMENT = 0.046           # in meters
-# XMOVEMENT = 0.392           # in meters
-
-# MOVEMENTS = [[XMOVEMENT, ZMOVEMENT, ROTATION],
-#             [XMOVEMENT, ZMOVEMENT, ROTATION],
-#             [0.071, -40.6, (pi * 45/2)/180 ]]
-
-
-# Movements for photos with charuco
-# MOVEMENTS = [[0.05, 0, 0]]
-MOVEMENTS = [
-            [-0.05, 0, 0.209],
-            [-0.05, 0.05, 0],
-            [-0.1, -0.05, 0],
-            [-0.1, -0.05, 0],
-            [-0.05, 0.05, 0.227]]
-
-
-#PATHS = ['photos_made_by_phone_testing_2/IMG_1_IMG_2_matches.npz']
-PATHS = ['soup_photos_full_movements/IMG_1_IMG_2_matches.npz',
-        'soup_photos_full_movements/IMG_2_IMG_3_matches.npz', 
-        'soup_photos_full_movements/IMG_3_IMG_4_matches.npz', 
-        'soup_photos_full_movements/IMG_4_IMG_5_matches.npz']
+PATHS = [   
+            './circle_photos_matches/photo00_photo01_matches.npz',
+            './circle_photos_matches/photo01_photo02_matches.npz',
+            './circle_photos_matches/photo02_photo03_matches.npz',
+            './circle_photos_matches/photo03_photo04_matches.npz',
+            './circle_photos_matches/photo04_photo05_matches.npz',
+            './circle_photos_matches/photo05_photo06_matches.npz',
+            './circle_photos_matches/photo06_photo07_matches.npz',
+            './circle_photos_matches/photo07_photo08_matches.npz',
+            './circle_photos_matches/photo08_photo09_matches.npz',
+            './circle_photos_matches/photo09_photo10_matches.npz',
+            './circle_photos_matches/photo10_photo11_matches.npz',
+            './circle_photos_matches/photo11_photo12_matches.npz'
+        ]
 
 K = np.array([
     [1000, 0, 0],
@@ -67,42 +60,49 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
 
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
 
-    
+def extract_matches(path):
+	npz = np.load(path)
+	npz.files
+	['keypoints0', 'keypoints1', 'matches', 'match_confidence']
+
+	points0 = np.array([[2,3]])
+	points1 = np.array([[2,3]])
+
+	tab0 = npz['keypoints0']
+	tab1 = npz['keypoints1']
+	tab2 = npz['matches']
+
+	for x in range(tab2.size):
+		if (tab2[x] != -1):
+			points0 = np.insert(points0, points0.size // 2, tab0[x], 0)
+			points1 = np.insert(points1, points1.size // 2, tab1[tab2[x]], 0)
+			 
+			 
+	points0 = np.delete(points0, 0, 0)
+	points1 = np.delete(points1, 0, 0)
+
+	if (points0.size < 8 or points1.size < 8):
+		print("To few points to produce fundamental matrix.")
+	elif (points0.size != points1.size):
+		print("Sizes don't match! Suspicious...")
+	else:
+		return(points0, points1)
+
+HOW_MANY_POINTS_DEFAULT = 1
 
 def main():
-    HOW_MANY_POINTS = 30
-
     for i in range(len(PATHS)): 
-        # to jest nadpisywane i tak
         print(PATHS[i])
-        (points1, points2) = matches.find_matches(PATHS[i])
-
-        # # points from charuco board measured with gimp on 26.02. The second robot is moving in relation
-        # # to the first one: 5cm to the left. Both are in distance of 30cm from the board.
-        # points1 = np.array([[1500, 3399], [589,3407], [586, 3110], [881, 3113], [877, 2820], [1173, 2820]])
-        # points2 = np.array([[2034, 3390], [1122, 3396], [1119, 3100], [1416, 3104], [1414, 2809], [1710, 2811]])
-        # HOW_MANY_POINTS = 6
-
-        # points1 = np.array([[1003, 3410], [107, 3412], [102, 3121], [392, 3123], [386, 2831], [677, 2834]])
-        # points2 = np.array([[2000, 3419], [1093, 3428], [1090, 3135], [1385, 3137], [1383, 2842], [1677, 2844]])
-        # HOW_MANY_POINTS = 6
-
-        # points1 = np.array([[898, 3208], [105, 3227], [101, 2970], [360, 2968], [355, 2714], [612, 2711]])
-        # points2 = np.array([[2083, 3803], [991, 3815], [988, 3456], [1342, 3460], [1342, 3106], [1695, 3108]])
-        # HOW_MANY_POINTS = 6
-
-        # points1 = np.array([[1984, 3404], [1990, 3154], [2228, 3153], [2260, 2827], [2109, 2717], [1468, 2595]])
-        # points2 = np.array([[2405, 3513], [2408, 3256], [2662, 3299], [2693, 2956], [2529, 2823], [1902, 2640]])
-        # HOW_MANY_POINTS = 6
+        (points1, points2) = extract_matches(PATHS[i])
+        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
-        #X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], intrinsic)
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], cameraMatrix)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
-        #  break
+
 
 if __name__ == '__main__':
     main()
