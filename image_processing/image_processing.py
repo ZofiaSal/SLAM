@@ -58,37 +58,23 @@ def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
     projectionMatrix1 = intrinsicCamera @ extrinsicCamera1
     projectionMatrix2 = intrinsicCamera @ extrinsicCamera2
 
-    return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, points1.astype(np.float64).T, points2.astype(np.float64).T)
+    return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, 
+                                 points1.astype(np.float64).T, 
+                                 points2.astype(np.float64).T)
 
 def extract_matches(path):
-	npz = np.load(path)
-	npz.files
-	['keypoints0', 'keypoints1', 'matches', 'match_confidence']
+    data = np.load(path)
+    matches = data['matches']
+    keypoints0 = data['keypoints0']
+    keypoints1 = data['keypoints1']
+    points0 = keypoints0[matches != -1]
+    points1 = keypoints1[matches[matches != -1]]
+    if points0.size < 8 or points1.size < 8:
+        print("Too few points to produce fundamental matrix.")
+    else:
+        return points0, points1
 
-	points0 = np.array([[2,3]])
-	points1 = np.array([[2,3]])
-
-	tab0 = npz['keypoints0']
-	tab1 = npz['keypoints1']
-	tab2 = npz['matches']
-
-	for x in range(tab2.size):
-		if (tab2[x] != -1):
-			points0 = np.insert(points0, points0.size // 2, tab0[x], 0)
-			points1 = np.insert(points1, points1.size // 2, tab1[tab2[x]], 0)
-			 
-			 
-	points0 = np.delete(points0, 0, 0)
-	points1 = np.delete(points1, 0, 0)
-
-	if (points0.size < 8 or points1.size < 8):
-		print("To few points to produce fundamental matrix.")
-	elif (points0.size != points1.size):
-		print("Sizes don't match! Suspicious...")
-	else:
-		return(points0, points1)
-
-HOW_MANY_POINTS_DEFAULT = 1
+HOW_MANY_POINTS_DEFAULT = 8
 
 def main():
     for i in range(len(PATHS)): 
@@ -99,9 +85,16 @@ def main():
         for j in range(HOW_MANY_POINTS):
             print(points1[j],"   ", points2[j])
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],points2[:HOW_MANY_POINTS,:], MOVEMENTS[i], cameraMatrix)
+        points1 = np.array([[506, 404], [505, 188], [285, 186], [286, 405], [534, 395], [534, 220], [356, 219], [356, 396]])
+        points2 = np.array([[323, 405], [322, 187], [105, 187], [104, 404], [386, 396], [386, 219], [207, 218], [207, 396]])
+        MOVEMENTS = [[0.05, 0, 0]]
+
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
+                              points2[:HOW_MANY_POINTS,:], 
+                              MOVEMENTS[i], cameraMatrix)
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
+        break
 
 
 if __name__ == '__main__':
