@@ -44,19 +44,22 @@ K = np.array([
 
 # points1 - characteristic points from first picture 
 # points2 - characteristic points for corresponding points from picture two
-# distance - the change from where picture 1 was taken to where picture 2 was taken [x,z,alpha] where alpha is a clockwise rotation in XY
-def calculatePoints3D(points1, points2, distance, intrinsicCamera = K):
-    angle = distance[2]
+# movement - the change from where picture 1 was taken to where picture 2 was taken [x,z,alpha] where alpha is a clockwise rotation in XY
+def calculatePoints3D(points1, points2, movement, intrinsicCamera = K):
+    angle = movement[2]
+
+    # R[I|-C]
     extrinsicCamera1 = [[1, 0, 0, 0],
                         [0, 1, 0, 0],
                         [0, 0, 1, 0]]
 
-    extrinsicCamera2 = [[np.cos(angle),     0,       np.sin(angle),  -distance[0]],
+    extrinsicCamera2 = [[np.cos(angle),     0,       np.sin(angle),  -movement[0]],
                         [0,                 1,      0,              0           ],
-                        [-np.sin(angle),   0,      np.cos(angle),  -distance[1]]]
+                        [-np.sin(angle),   0,      np.cos(angle),  -movement[1]]]
 
     projectionMatrix1 = intrinsicCamera @ extrinsicCamera1
     projectionMatrix2 = intrinsicCamera @ extrinsicCamera2
+    print("extrinsicCamera2:\n", extrinsicCamera2)
 
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, 
                                  points1.astype(np.float64).T, 
@@ -82,12 +85,42 @@ def main():
         (points1, points2) = extract_matches(PATHS[i])
         HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        for j in range(HOW_MANY_POINTS):
-            print(points1[j],"   ", points2[j])
+        # for j in range(HOW_MANY_POINTS):
+        #     print(points1[j],"   ", points2[j])
 
-        points1 = np.array([[506, 404], [505, 188], [285, 186], [286, 405], [534, 395], [534, 220], [356, 219], [356, 396]])
-        points2 = np.array([[323, 405], [322, 187], [105, 187], [104, 404], [386, 396], [386, 219], [207, 218], [207, 396]])
+        points1 = np.array([
+            [477, 404], [476, 188], [256, 186], [256, 405], 
+            [511, 395], [510, 220], [332, 219], [332, 396]
+            ])
+        
+        points2 = np.array([
+            [293, 405], [293, 186], [76, 187], [76, 404],
+            [362, 396], [362, 219], [184, 219], [184, 396]
+        ])
+
         MOVEMENTS = [[0.05, 0, 0]]
+
+        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
+                              points2[:HOW_MANY_POINTS,:], 
+                              MOVEMENTS[i], cameraMatrix)
+        X = cv2.convertPointsFromHomogeneous(X.T)
+        print(X[0])
+        break
+
+    for i in range(len(PATHS)): 
+        print(PATHS[i])
+        (points1, points2) = extract_matches(PATHS[i])
+        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+
+        points1 = np.array([
+            [657,  94]
+            ])
+        
+        points2 = np.array([
+            [732,  32]
+        ])
+
+        MOVEMENTS = [[0.11, 0.08, 30 * pi / 180]]
 
         X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
                               points2[:HOW_MANY_POINTS,:], 
