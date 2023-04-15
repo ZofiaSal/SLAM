@@ -112,21 +112,27 @@ def main():
         (points1, points2) = extract_matches(PATHS[i])
         HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        points1 = np.array([
-            [657,  94]
-            ])
-        
-        points2 = np.array([
-            [732,  32]
-        ])
+        points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
+        points2 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152]])
 
-        MOVEMENTS = [[0.11, 0.08, 30 * pi / 180]]
+        MOVEMENTS = [[0.1, 0.08, 30 * pi / 180]]
+
+        points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
+        points2 = np.array([[584, 410], [593, 404], [245, 411], [293, 405], [584, 133], [592, 159], [245, 131], [293, 157]])
+
+        MOVEMENTS = [[0.1, 0.08, 0]]
 
         X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
                               points2[:HOW_MANY_POINTS,:], 
                               MOVEMENTS[i], cameraMatrix)
         X = cv2.convertPointsFromHomogeneous(X.T)
-        print(X)
+        
+        X *= 100
+        X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+
+        for i in range(len(X_formatted)):
+            print(X_formatted[i])
+        
         break
 
 
