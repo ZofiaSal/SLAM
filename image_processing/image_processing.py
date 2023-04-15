@@ -12,8 +12,8 @@ distCoeffs = np.array([[ 1.76279343e-01, -6.07952723e-01, -4.64176532e-04, -4.96
 
 # Change depending on movement !!
 ROTATION = pi / 8   # in radians
-ZMOVEMENT = 0.009           # in meters
-XMOVEMENT = 0.046           # in meters
+ZMOVEMENT = 0.046           # in meters
+XMOVEMENT = 0.009           # in meters
 
 MOVEMENTS = []
 for i in range(16):
@@ -23,22 +23,21 @@ for i in range(16):
 # Change depending on desired photos!!
 # This is the output of SuperGlue (description how to get its: feature_points/README.md)
 PATHS = [   
-            './test_data_sets/circle_with_chess/photo_00_2023-04-16_photo_01_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_01_2023-04-16_photo_02_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_02_2023-04-16_photo_03_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_03_2023-04-16_photo_04_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_04_2023-04-16_photo_05_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_05_2023-04-16_photo_06_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_06_2023-04-16_photo_07_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_07_2023-04-16_photo_08_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_08_2023-04-16_photo_09_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_09_2023-04-16_photo_10_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_10_2023-04-16_photo_11_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_11_2023-04-16_photo_12_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_12_2023-04-16_photo_13_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_13_2023-04-16_photo_14_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_14_2023-04-16_photo_15_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/photo_15_2023-04-16_photo_16_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_01_2023-04-16_photo_02_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_02_2023-04-16_photo_03_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_03_2023-04-16_photo_04_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_04_2023-04-16_photo_05_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_05_2023-04-16_photo_06_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_06_2023-04-16_photo_07_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_07_2023-04-16_photo_08_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_08_2023-04-16_photo_09_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_09_2023-04-16_photo_10_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_10_2023-04-16_photo_11_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_11_2023-04-16_photo_12_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_12_2023-04-16_photo_13_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_13_2023-04-16_photo_14_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_14_2023-04-16_photo_15_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_15_2023-04-16_photo_16_2023-04-16_matches.npz',
         ]
 
 # points1 - characteristic points from first picture 
@@ -102,7 +101,6 @@ def calculatePointsFromPaths(PATHS):
                               MOVEMENTS[i])
         X = cv2.convertPointsFromHomogeneous(X.T)
         print(X)
-        break
 
 def main():
     # points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])

@@ -6,7 +6,11 @@ Firstly, find feature points using SuperGlue solution.
 
 Clone their repo: https://github.com/magicleap/SuperGluePretrainedNetwork
 
-Run: 
+Our current command:
+
+`./match_pairs.py --input_dir ../image_processing/test_data_sets/circle_with_chess/ --output_dir ../image_processing/test_data_sets/circle_with_chess/pairs_data/ --input_pairs ../image_processing/test_data_sets/circle_with_chess/description.txt --viz --fast_viz --resize -1 --match_threshold 0.3 --shuffle --max_keypoints 50 --nms_radius 30`
+
+Previous description: 
 `./match_pairs.py --input_dir arg --output_dir arg --input_pairs arg --viz --resize -1 --match_threshold 0.2 --max_keypoints 100`
 
 `--input_dir` - directory with imput photos
