@@ -3,6 +3,7 @@ from gettext import translation
 import numpy as np
 import cv2
 
+
 # OUR FINAL CAMERA CALIBRATION MATRIX
 calibration = 0.6442544274536695
 cameraMatrix = np.array([[932.35252209,   0.,         657.24325896],
@@ -79,61 +80,100 @@ def extract_matches(path):
 
 HOW_MANY_POINTS_DEFAULT = 8
 
+def calculate(points1, points2, movement):
+    HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+
+    print("points1:\n", points1)
+    print("points2:\n", points2)
+    print("movement:\n", movement)
+
+    X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
+                            points2[:HOW_MANY_POINTS,:], 
+                            movement, cameraMatrix)
+    X = cv2.convertPointsFromHomogeneous(X.T)
+    
+    X *= 100
+    X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+    print("CALCULATE")
+    for i in range(len(X_formatted)):
+        print(X_formatted[i])
+
 def main():
-    for i in range(len(PATHS)): 
-        print(PATHS[i])
-        (points1, points2) = extract_matches(PATHS[i])
-        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        # for j in range(HOW_MANY_POINTS):
-        #     print(points1[j],"   ", points2[j])
+    print("TUTAJ")
 
-        points1 = np.array([
-            [477, 404], [476, 188], [256, 186], [256, 405], 
-            [511, 395], [510, 220], [332, 219], [332, 396]
-            ])
+    points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
+    points2 = np.array([[906, 397], [884, 393], [657, 393], [657, 396], [907, 190], [884, 205], [657, 206], [657, 192], ])
+    # MOVEMENTS = [[-12.5, -0.2, -30 * pi / 180]]
+    MOVEMENTS = [[-0.10, -0.08, -30 * pi / 180]]
+
+    calculate(points1, points2, MOVEMENTS[0])
+
+    # for i in range(len(PATHS)): 
+    #     print(PATHS[i])
+    #     (points1, points2) = extract_matches(PATHS[i])
+    #     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+
+    #     # for j in range(HOW_MANY_POINTS):
+    #     #     print(points1[j],"   ", points2[j])
+
+    #     points1 = np.array([
+    #         [477, 404], [476, 188], [256, 186], [256, 405], 
+    #         [511, 395], [510, 220], [332, 219], [332, 396]
+    #         ])
         
-        points2 = np.array([
-            [293, 405], [293, 186], [76, 187], [76, 404],
-            [362, 396], [362, 219], [184, 219], [184, 396]
-        ])
+    #     points2 = np.array([
+    #         [293, 405], [293, 186], [76, 187], [76, 404],
+    #         [362, 396], [362, 219], [184, 219], [184, 396]
+    #     ])
 
-        MOVEMENTS = [[0.05, 0, 0]]
+    #     MOVEMENTS = [[0.05, 0, 0]]
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
-                              points2[:HOW_MANY_POINTS,:], 
-                              MOVEMENTS[i], cameraMatrix)
-        X = cv2.convertPointsFromHomogeneous(X.T)
-        print(X[0])
-        break
+    #     X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
+    #                           points2[:HOW_MANY_POINTS,:], 
+    #                           MOVEMENTS[i], cameraMatrix)
+    #     X = cv2.convertPointsFromHomogeneous(X.T)
+    #     print("from calculate:")
+    #     print(X[0])
+    #     break
 
-    for i in range(len(PATHS)): 
-        print(PATHS[i])
-        (points1, points2) = extract_matches(PATHS[i])
-        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+    # for i in range(len(PATHS)): 
+    #     print(PATHS[i])
+    #     (points1, points2) = extract_matches(PATHS[i])
+    #     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
-        points2 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152]])
+    #     points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
+    #     points2 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152]])
 
-        MOVEMENTS = [[0.1, 0.08, 30 * pi / 180]]
+    #     MOVEMENTS = [[0.1, 0.08, 30 * pi / 180]]
 
-        points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
-        points2 = np.array([[584, 410], [593, 404], [245, 411], [293, 405], [584, 133], [592, 159], [245, 131], [293, 157]])
+    #     points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
+    #     points2 = np.array([[584, 410], [593, 404], [245, 411], [293, 405], [584, 133], [592, 159], [245, 131], [293, 157]])
 
-        MOVEMENTS = [[0.1, 0.08, 0]]
+    #     MOVEMENTS = [[0.1, 0.08, 0]]
 
-        X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
-                              points2[:HOW_MANY_POINTS,:], 
-                              MOVEMENTS[i], cameraMatrix)
-        X = cv2.convertPointsFromHomogeneous(X.T)
+    #     points1 = np.array([
+    #         [906, 397], [884, 393], [657, 393], [657, 396], 
+    #         [907, 190], [884, 205], [657, 206], [657, 192]])
+
+    #     points2 = np.array([
+    #         [584, 410], [593, 404], [293, 405], [245, 411], 
+    #         [582, 133], [590, 159], [293, 157], [245, 131]])
+
+    #     X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
+    #                           points2[:HOW_MANY_POINTS,:], 
+    #                           MOVEMENTS[i], cameraMatrix)
+    #     X = cv2.convertPointsFromHomogeneous(X.T)
         
-        X *= 100
-        X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+    #     X *= 100
+    #     X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
 
-        for i in range(len(X_formatted)):
-            print(X_formatted[i])
+    #     for i in range(len(X_formatted)):
+    #         print(X_formatted[i])
+
+    #     calculate(points1, points2, MOVEMENTS[0])
         
-        break
+    #     break
 
 
 if __name__ == '__main__':
