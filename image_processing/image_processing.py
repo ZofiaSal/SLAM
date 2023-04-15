@@ -1,5 +1,4 @@
 from cmath import pi
-from gettext import translation
 import numpy as np
 import cv2
 
@@ -24,29 +23,24 @@ for i in range(12):
 # Change depending on desired photos!!
 # This is the output of SuperGlue (description how to get its: feature_points/README.md)
 PATHS = [   
-            './circle_photos_matches/photo00_photo01_matches.npz',
-            './circle_photos_matches/photo01_photo02_matches.npz',
-            './circle_photos_matches/photo02_photo03_matches.npz',
-            './circle_photos_matches/photo03_photo04_matches.npz',
-            './circle_photos_matches/photo04_photo05_matches.npz',
-            './circle_photos_matches/photo05_photo06_matches.npz',
-            './circle_photos_matches/photo06_photo07_matches.npz',
-            './circle_photos_matches/photo07_photo08_matches.npz',
-            './circle_photos_matches/photo08_photo09_matches.npz',
-            './circle_photos_matches/photo09_photo10_matches.npz',
-            './circle_photos_matches/photo10_photo11_matches.npz',
-            './circle_photos_matches/photo11_photo12_matches.npz'
+            './test_data_sets/circle_photos_matches/photo00_photo01_matches.npz',
+            './test_data_sets/circle_photos_matches/photo01_photo02_matches.npz',
+            './test_data_sets/circle_photos_matches/photo02_photo03_matches.npz',
+            './test_data_sets/circle_photos_matches/photo03_photo04_matches.npz',
+            './test_data_sets/circle_photos_matches/photo04_photo05_matches.npz',
+            './test_data_sets/circle_photos_matches/photo05_photo06_matches.npz',
+            './test_data_sets/circle_photos_matches/photo06_photo07_matches.npz',
+            './test_data_sets/circle_photos_matches/photo07_photo08_matches.npz',
+            './test_data_sets/circle_photos_matches/photo08_photo09_matches.npz',
+            './test_data_sets/circle_photos_matches/photo09_photo10_matches.npz',
+            './test_data_sets/circle_photos_matches/photo10_photo11_matches.npz',
+            './test_data_sets/circle_photos_matches/photo11_photo12_matches.npz'
         ]
-
-K = np.array([
-    [1000, 0, 0],
-    [0, 1000, 0],
-    [0, 0, 1]])
 
 # points1 - characteristic points from first picture 
 # points2 - characteristic points for corresponding points from picture two
 # movement - the change from where picture 1 was taken to where picture 2 was taken [x,z,alpha] where alpha is a clockwise rotation in XY
-def calculatePoints3D(points1, points2, movement, intrinsicCamera = K):
+def triangulatePoints(points1, points2, movement, intrinsicCamera = cameraMatrix):
     angle = movement[2]
 
     # R[I|-C]
@@ -60,7 +54,6 @@ def calculatePoints3D(points1, points2, movement, intrinsicCamera = K):
 
     projectionMatrix1 = intrinsicCamera @ extrinsicCamera1
     projectionMatrix2 = intrinsicCamera @ extrinsicCamera2
-    print("extrinsicCamera2:\n", extrinsicCamera2)
 
     return cv2.triangulatePoints(projectionMatrix1, projectionMatrix2, 
                                  points1.astype(np.float64).T, 
@@ -80,101 +73,42 @@ def extract_matches(path):
 
 HOW_MANY_POINTS_DEFAULT = 8
 
-def calculate(points1, points2, movement):
+def calculatePoints3D(points1, points2, movement):
     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-    print("points1:\n", points1)
-    print("points2:\n", points2)
-    print("movement:\n", movement)
-
-    X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
+    X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
                             points2[:HOW_MANY_POINTS,:], 
-                            movement, cameraMatrix)
+                            movement)
     X = cv2.convertPointsFromHomogeneous(X.T)
     
     X *= 100
     X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
-    print("CALCULATE")
+
     for i in range(len(X_formatted)):
         print(X_formatted[i])
 
+def calculatePointsFromPaths(PATHS):
+    for i in range(len(PATHS)): 
+        print(PATHS[i])
+        (points1, points2) = extract_matches(PATHS[i])
+        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+
+        X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
+                              points2[:HOW_MANY_POINTS,:], 
+                              MOVEMENTS[i])
+        X = cv2.convertPointsFromHomogeneous(X.T)
+        print(X)
+        break
+
 def main():
-
-    print("TUTAJ")
-
     points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
     points2 = np.array([[906, 397], [884, 393], [657, 393], [657, 396], [907, 190], [884, 205], [657, 206], [657, 192], ])
-    # MOVEMENTS = [[-12.5, -0.2, -30 * pi / 180]]
+    # MOVEMENTS = [[12.5, 0.2, 30 * pi / 180]]
     MOVEMENTS = [[-0.10, -0.08, -30 * pi / 180]]
 
-    calculate(points1, points2, MOVEMENTS[0])
+    calculatePoints3D(points1, points2, MOVEMENTS[0])
 
-    # for i in range(len(PATHS)): 
-    #     print(PATHS[i])
-    #     (points1, points2) = extract_matches(PATHS[i])
-    #     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
-
-    #     # for j in range(HOW_MANY_POINTS):
-    #     #     print(points1[j],"   ", points2[j])
-
-    #     points1 = np.array([
-    #         [477, 404], [476, 188], [256, 186], [256, 405], 
-    #         [511, 395], [510, 220], [332, 219], [332, 396]
-    #         ])
-        
-    #     points2 = np.array([
-    #         [293, 405], [293, 186], [76, 187], [76, 404],
-    #         [362, 396], [362, 219], [184, 219], [184, 396]
-    #     ])
-
-    #     MOVEMENTS = [[0.05, 0, 0]]
-
-    #     X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
-    #                           points2[:HOW_MANY_POINTS,:], 
-    #                           MOVEMENTS[i], cameraMatrix)
-    #     X = cv2.convertPointsFromHomogeneous(X.T)
-    #     print("from calculate:")
-    #     print(X[0])
-    #     break
-
-    # for i in range(len(PATHS)): 
-    #     print(PATHS[i])
-    #     (points1, points2) = extract_matches(PATHS[i])
-    #     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
-
-    #     points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
-    #     points2 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152]])
-
-    #     MOVEMENTS = [[0.1, 0.08, 30 * pi / 180]]
-
-    #     points1 =np.array([[906, 397], [884, 393], [657, 396], [657, 393], [907, 190], [884, 205], [657, 192], [657, 206]])
-    #     points2 = np.array([[584, 410], [593, 404], [245, 411], [293, 405], [584, 133], [592, 159], [245, 131], [293, 157]])
-
-    #     MOVEMENTS = [[0.1, 0.08, 0]]
-
-    #     points1 = np.array([
-    #         [906, 397], [884, 393], [657, 393], [657, 396], 
-    #         [907, 190], [884, 205], [657, 206], [657, 192]])
-
-    #     points2 = np.array([
-    #         [584, 410], [593, 404], [293, 405], [245, 411], 
-    #         [582, 133], [590, 159], [293, 157], [245, 131]])
-
-    #     X = calculatePoints3D(points1[:HOW_MANY_POINTS,:],
-    #                           points2[:HOW_MANY_POINTS,:], 
-    #                           MOVEMENTS[i], cameraMatrix)
-    #     X = cv2.convertPointsFromHomogeneous(X.T)
-        
-    #     X *= 100
-    #     X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
-
-    #     for i in range(len(X_formatted)):
-    #         print(X_formatted[i])
-
-    #     calculate(points1, points2, MOVEMENTS[0])
-        
-    #     break
-
+    # calculatePointsFromPaths(PATHS)
 
 if __name__ == '__main__':
     main()
