@@ -11,30 +11,34 @@ cameraMatrix = np.array([[932.35252209,   0.,         657.24325896],
 distCoeffs = np.array([[ 1.76279343e-01, -6.07952723e-01, -4.64176532e-04, -4.96839648e-04, 6.04867450e-01]])
 
 # Change depending on movement !!
-ROTATION = -(pi * 45)/180   # in radians
-ZMOVEMENT = 0.046           # in meters
-XMOVEMENT = 0.392           # in meters
+ROTATION = pi / 8   # in radians
+ZMOVEMENT = 0.009           # in meters
+XMOVEMENT = 0.046           # in meters
 
 MOVEMENTS = []
-for i in range(12):
+for i in range(16):
     movement = [XMOVEMENT, ZMOVEMENT, ROTATION]
     MOVEMENTS.append(movement)
 
 # Change depending on desired photos!!
 # This is the output of SuperGlue (description how to get its: feature_points/README.md)
 PATHS = [   
-            './test_data_sets/circle_photos_matches/photo00_photo01_matches.npz',
-            './test_data_sets/circle_photos_matches/photo01_photo02_matches.npz',
-            './test_data_sets/circle_photos_matches/photo02_photo03_matches.npz',
-            './test_data_sets/circle_photos_matches/photo03_photo04_matches.npz',
-            './test_data_sets/circle_photos_matches/photo04_photo05_matches.npz',
-            './test_data_sets/circle_photos_matches/photo05_photo06_matches.npz',
-            './test_data_sets/circle_photos_matches/photo06_photo07_matches.npz',
-            './test_data_sets/circle_photos_matches/photo07_photo08_matches.npz',
-            './test_data_sets/circle_photos_matches/photo08_photo09_matches.npz',
-            './test_data_sets/circle_photos_matches/photo09_photo10_matches.npz',
-            './test_data_sets/circle_photos_matches/photo10_photo11_matches.npz',
-            './test_data_sets/circle_photos_matches/photo11_photo12_matches.npz'
+            './test_data_sets/circle_with_chess/photo_00_2023-04-16_photo_01_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_01_2023-04-16_photo_02_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_02_2023-04-16_photo_03_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_03_2023-04-16_photo_04_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_04_2023-04-16_photo_05_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_05_2023-04-16_photo_06_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_06_2023-04-16_photo_07_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_07_2023-04-16_photo_08_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_08_2023-04-16_photo_09_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_09_2023-04-16_photo_10_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_10_2023-04-16_photo_11_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_11_2023-04-16_photo_12_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_12_2023-04-16_photo_13_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_13_2023-04-16_photo_14_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_14_2023-04-16_photo_15_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/photo_15_2023-04-16_photo_16_2023-04-16_matches.npz',
         ]
 
 # points1 - characteristic points from first picture 
@@ -101,14 +105,14 @@ def calculatePointsFromPaths(PATHS):
         break
 
 def main():
-    points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
-    points2 = np.array([[906, 397], [884, 393], [657, 393], [657, 396], [907, 190], [884, 205], [657, 206], [657, 192], ])
-    # MOVEMENTS = [[12.5, 0.2, 30 * pi / 180]]
-    MOVEMENTS = [[-0.10, -0.08, -30 * pi / 180]]
+    # points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
+    # points2 = np.array([[906, 397], [884, 393], [657, 393], [657, 396], [907, 190], [884, 205], [657, 206], [657, 192], ])
+    # # MOVEMENTS = [[12.5, 0.2, 30 * pi / 180]]
+    # MOVEMENTS = [[-0.10, -0.08, -30 * pi / 180]]
 
-    calculatePoints3D(points1, points2, MOVEMENTS[0])
+    # calculatePoints3D(points1, points2, MOVEMENTS[0])
 
-    # calculatePointsFromPaths(PATHS)
+    calculatePointsFromPaths(PATHS)
 
 if __name__ == '__main__':
     main()
