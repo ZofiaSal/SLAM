@@ -1,8 +1,6 @@
 from cmath import pi
 import numpy as np
 import cv2
-import os
-os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 # OUR FINAL CAMERA CALIBRATION MATRIX
 calibration = 0.6442544274536695
@@ -91,6 +89,10 @@ def debugImage(im):
         y = int(points2[i][1])
         cv2.circle(img2, (x, y), 5, (0,255,0), -1)
         cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+
+    # draw the chessboard coordinate system
+    img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
+    img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
 
     cv2.imwrite('img1.jpg', img1)
     cv2.imwrite('img2.jpg', img2)
