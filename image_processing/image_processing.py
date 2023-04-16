@@ -1,7 +1,8 @@
 from cmath import pi
 import numpy as np
 import cv2
-
+import os
+os.environ["QT_QPA_PLATFORM"] = "xcb"
 
 # OUR FINAL CAMERA CALIBRATION MATRIX
 calibration = 0.6442544274536695
@@ -12,8 +13,8 @@ distCoeffs = np.array([[ 1.76279343e-01, -6.07952723e-01, -4.64176532e-04, -4.96
 
 # Change depending on movement !!
 ROTATION = pi / 8   # in radians
-ZMOVEMENT = 0.046           # in meters
 XMOVEMENT = 0.009           # in meters
+ZMOVEMENT = 0.046           # in meters
 
 MOVEMENTS = []
 for i in range(16):
@@ -74,7 +75,7 @@ def extract_matches(path):
     else:
         return points0, points1
 
-HOW_MANY_POINTS_DEFAULT = 8
+HOW_MANY_POINTS_DEFAULT = 20
 
 def calculatePoints3D(points1, points2, movement):
     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
@@ -90,17 +91,45 @@ def calculatePoints3D(points1, points2, movement):
     for i in range(len(X_formatted)):
         print(X_formatted[i])
 
+def debugImage(im):
+    img1 = cv2.imread('./test_data_sets/circle_with_chess/photo_06_2023-04-16.jpg')
+    img2 = cv2.imread('./test_data_sets/circle_with_chess/photo_07_2023-04-16.jpg')
+
+    (points1, points2) = extract_matches(PATHS[im])
+    HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+
+    for i in range(len(points1)):
+        x = int(points1[i][0])
+        y = int(points1[i][1])
+        cv2.circle(img1, (x, y), 5, (0,255,0), -1)
+        cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+        
+        x = int(points2[i][0])
+        y = int(points2[i][1])
+        cv2.circle(img2, (x, y), 5, (0,255,0), -1)
+        cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+
+    cv2.imwrite('img1.jpg', img1)
+    cv2.imwrite('img2.jpg', img2)
+
+
 def calculatePointsFromPaths(PATHS):
     for i in range(len(PATHS)): 
-        print(PATHS[i])
-        (points1, points2) = extract_matches(PATHS[i])
-        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+        if i == 5:
+            print(PATHS[i])
+            debugImage(i)
+            (points1, points2) = extract_matches(PATHS[i])
+            HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
-                              points2[:HOW_MANY_POINTS,:], 
-                              MOVEMENTS[i])
-        X = cv2.convertPointsFromHomogeneous(X.T)
-        print(X)
+            X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
+                                points2[:HOW_MANY_POINTS,:], 
+                                MOVEMENTS[i])
+            X = cv2.convertPointsFromHomogeneous(X.T)
+            X *= 100
+            X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+
+            for i in range(len(X_formatted)):
+                print(X_formatted[i])
 
 def main():
     # points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
