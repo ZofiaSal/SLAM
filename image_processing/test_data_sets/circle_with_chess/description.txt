@@ -1,16 +1,34 @@
-photo_00_2023-04-16.jpg photo_01_2023-04-16.jpg
-photo_01_2023-04-16.jpg photo_02_2023-04-16.jpg
-photo_02_2023-04-16.jpg photo_03_2023-04-16.jpg
-photo_03_2023-04-16.jpg photo_04_2023-04-16.jpg
-photo_04_2023-04-16.jpg photo_05_2023-04-16.jpg
-photo_05_2023-04-16.jpg photo_06_2023-04-16.jpg
-photo_06_2023-04-16.jpg photo_07_2023-04-16.jpg
-photo_07_2023-04-16.jpg photo_08_2023-04-16.jpg
-photo_08_2023-04-16.jpg photo_09_2023-04-16.jpg
-photo_09_2023-04-16.jpg photo_10_2023-04-16.jpg
-photo_10_2023-04-16.jpg photo_11_2023-04-16.jpg
-photo_11_2023-04-16.jpg photo_12_2023-04-16.jpg
-photo_12_2023-04-16.jpg photo_13_2023-04-16.jpg
-photo_13_2023-04-16.jpg photo_14_2023-04-16.jpg
-photo_14_2023-04-16.jpg photo_15_2023-04-16.jpg
-photo_15_2023-04-16.jpg photo_16_2023-04-16.jpg
+# Change depending on movement !!
+ROTATION = pi / 8   # in radians
+XMOVEMENT = 0.009           # in meters
+ZMOVEMENT = 0.046           # in meters
+
+# Change depending on movement !!
+ROTATION = pi / 8   # in radians
+XMOVEMENT = 0.009           # in meters
+ZMOVEMENT = 0.046           # in meters
+
+MOVEMENTS = []
+for i in range(16):
+    movement = [XMOVEMENT, ZMOVEMENT, ROTATION]
+    MOVEMENTS.append(movement)
+
+# Change depending on desired photos!!
+# This is the output of SuperGlue (description how to get its: feature_points/README.md)
+PATHS = [   
+            './test_data_sets/circle_with_chess/pairs_data/photo_01_2023-04-16_photo_02_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_02_2023-04-16_photo_03_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_03_2023-04-16_photo_04_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_04_2023-04-16_photo_05_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_05_2023-04-16_photo_06_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_06_2023-04-16_photo_07_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_07_2023-04-16_photo_08_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_08_2023-04-16_photo_09_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_09_2023-04-16_photo_10_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_10_2023-04-16_photo_11_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_11_2023-04-16_photo_12_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_12_2023-04-16_photo_13_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_13_2023-04-16_photo_14_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_14_2023-04-16_photo_15_2023-04-16_matches.npz',
+            './test_data_sets/circle_with_chess/pairs_data/photo_15_2023-04-16_photo_16_2023-04-16_matches.npz',
+        ]

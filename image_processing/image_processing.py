@@ -16,29 +16,12 @@ ROTATION = pi / 8   # in radians
 XMOVEMENT = 0.009           # in meters
 ZMOVEMENT = 0.046           # in meters
 
-MOVEMENTS = []
-for i in range(16):
-    movement = [XMOVEMENT, ZMOVEMENT, ROTATION]
-    MOVEMENTS.append(movement)
+MOVEMENTS = [[-0.09, 0.06, -30 * pi / 180]]
 
 # Change depending on desired photos!!
 # This is the output of SuperGlue (description how to get its: feature_points/README.md)
 PATHS = [   
-            './test_data_sets/circle_with_chess/pairs_data/photo_01_2023-04-16_photo_02_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_02_2023-04-16_photo_03_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_03_2023-04-16_photo_04_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_04_2023-04-16_photo_05_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_05_2023-04-16_photo_06_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_06_2023-04-16_photo_07_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_07_2023-04-16_photo_08_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_08_2023-04-16_photo_09_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_09_2023-04-16_photo_10_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_10_2023-04-16_photo_11_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_11_2023-04-16_photo_12_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_12_2023-04-16_photo_13_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_13_2023-04-16_photo_14_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_14_2023-04-16_photo_15_2023-04-16_matches.npz',
-            './test_data_sets/circle_with_chess/pairs_data/photo_15_2023-04-16_photo_16_2023-04-16_matches.npz',
+            './test_data_sets/fridge/fridge_pairs/photo02_photo03_matches.npz',
         ]
 
 # points1 - characteristic points from first picture 
@@ -75,7 +58,7 @@ def extract_matches(path):
     else:
         return points0, points1
 
-HOW_MANY_POINTS_DEFAULT = 20
+HOW_MANY_POINTS_DEFAULT = 1000
 
 def calculatePoints3D(points1, points2, movement):
     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
@@ -92,8 +75,8 @@ def calculatePoints3D(points1, points2, movement):
         print(X_formatted[i])
 
 def debugImage(im):
-    img1 = cv2.imread('./test_data_sets/circle_with_chess/photo_06_2023-04-16.jpg')
-    img2 = cv2.imread('./test_data_sets/circle_with_chess/photo_07_2023-04-16.jpg')
+    img1 = cv2.imread('./test_data_sets/fridge/photo02.jpg')
+    img2 = cv2.imread('./test_data_sets/fridge/photo03.jpg')
 
     (points1, points2) = extract_matches(PATHS[im])
     HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
@@ -115,30 +98,34 @@ def debugImage(im):
 
 def calculatePointsFromPaths(PATHS):
     for i in range(len(PATHS)): 
-        if i == 5:
-            print(PATHS[i])
+        print(PATHS[i])
+        if i == 0:
             debugImage(i)
-            (points1, points2) = extract_matches(PATHS[i])
-            HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+        (points1, points2) = extract_matches(PATHS[i])
+        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-            X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
-                                points2[:HOW_MANY_POINTS,:], 
-                                MOVEMENTS[i])
-            X = cv2.convertPointsFromHomogeneous(X.T)
-            X *= 100
-            X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+        print("Points 1:")
+        print(points1)
+        print("Points 2:")
+        print(points2)
 
-            for i in range(len(X_formatted)):
-                print(X_formatted[i])
+        X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
+                            points2[:HOW_MANY_POINTS,:], 
+                            MOVEMENTS[i])
+        X = cv2.convertPointsFromHomogeneous(X.T)
+        X *= 100
+        X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+
+        for i in range(len(X_formatted)):
+            print(i, end=" "); print(points1[i], end=" "); print(X_formatted[i])
 
 def main():
-    # points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
-    # points2 = np.array([[906, 397], [884, 393], [657, 393], [657, 396], [907, 190], [884, 205], [657, 206], [657, 192], ])
-    # # MOVEMENTS = [[12.5, 0.2, 30 * pi / 180]]
-    # MOVEMENTS = [[-0.10, -0.08, -30 * pi / 180]]
+    points1 = np.array([[1069, 416], [1080, 410], [772, 401], [732, 406], [1069, 109], [1080, 136], [772, 172], [732, 152], ])
+    points2 = np.array([[906, 397], [884, 393], [657, 393], [657, 396], [907, 190], [884, 205], [657, 206], [657, 192], ])
+    MOVEMENTS = [[-0.1, -0.08, -30 * pi / 180]] # from 2 to 0
+    calculatePoints3D(points1, points2, MOVEMENTS[0])
 
-    # calculatePoints3D(points1, points2, MOVEMENTS[0])
-
+    print("from paths:")
     calculatePointsFromPaths(PATHS)
 
 if __name__ == '__main__':
