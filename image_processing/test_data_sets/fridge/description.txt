@@ -1,2 +1,8 @@
 [0.09, -0.06, 0.0] # 0->1
 [-0.09, 0.06, -30 * pi / 180] # 2->3
+
+# Change depending on desired photos!!
+# This is the output of SuperGlue (description how to get its: feature_points/README.md)
+PATHS = [   
+            './test_data_sets/fridge/fridge_pairs/photo02_photo03_matches.npz',
+        ]
