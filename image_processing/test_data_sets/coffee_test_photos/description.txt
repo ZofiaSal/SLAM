@@ -1,2 +1,0 @@
-MOVEMENT = [[0.1, 0.08, 0.5236]]
-# 30 deg anticlockwise

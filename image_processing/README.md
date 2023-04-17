@@ -1,12 +1,24 @@
-# SLAM - image processing
+# SLAM - image processing: 3D reconstruction
 
 ## Finding matches
 
-Firstly, find feature points using SuperGlue solution.
+Clone the SuperGlue repo in the _/SLAM/_ directory: 
 
-Clone their repo: https://github.com/magicleap/SuperGluePretrainedNetwork
+https://github.com/magicleap/SuperGluePretrainedNetwork
 
-Our current command:
+Run the reconstruction:
+
+`python reconstruction3d.py --data 'data_set_directory' --fm`
+
+Omit the `--fm` if the .npz files with matches are already generated.
+
+Replace `data_set_directory` with the appropriate name.
+In the */SLAM/image_processing/test_data_sets/data_set_directory* place the 
+input photos and the *movement.py* file. In the */SLAM/image_processing/test_data_sets/data_set_directory/pairs_data/description.txt* place the pairs of photos (for SuperGlue). The debug output will be evaluated correctly only if you put them in alphabetical order. In the *movement.py* file put the description of the movements
+between pairs of photos placed in the *description.txt* file. **See and example __template_ directory**
+
+
+<!-- Our current command:
 
 `./match_pairs.py --input_dir ../image_processing/test_data_sets/circle_with_chess/ --output_dir ../image_processing/test_data_sets/circle_with_chess/pairs_data/ --input_pairs ../image_processing/test_data_sets/circle_with_chess/description.txt --viz --fast_viz --resize -1 --match_threshold 0.3 --shuffle --max_keypoints 50 --nms_radius 30`
 
@@ -27,4 +39,4 @@ Previous description:
 
 `--match_threshold 0.2` - pairs accuracy tolerance
 
-`--max_keypoints 100` - maximum number of keypoints to process
+`--max_keypoints 100` - maximum number of keypoints to process -->
