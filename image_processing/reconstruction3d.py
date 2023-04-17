@@ -98,54 +98,61 @@ def extract_matches(path):
     else:
         return points0, points1
 
-def debugImage(im):
-    img1 = cv2.imread('./test_data_sets/circle_with_chess/photo_02_2023-04-16.jpg')
-    img2 = cv2.imread('./test_data_sets/circle_with_chess/photo_03_2023-04-16.jpg')
+def debugImage():
+    line = 0
+    with open('./test_data_sets/' + data_set + '/pairs_data/description.txt', 'r') as f:
+        for line in f:
+            # Split the line into a list of image names
+            image_names = line.strip().split()
+            
+            # Assign the image names to two separate variables
+            img1_name = image_names[0]
+            img2_name = image_names[1]
 
-    (points1, points2) = extract_matches(PATHS[im])
-    HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+            img1 = cv2.imread('./test_data_sets/' + data_set + '/' + img1_name)
+            img2 = cv2.imread('./test_data_sets/' + data_set + '/' + img2_name)
+            (points1, points2) = extract_matches(PATHS[0])
+            for i in range(len(points1)):
+                x = int(points1[i][0])
+                y = int(points1[i][1])
+                cv2.circle(img1, (x, y), 5, (0,255,0), -1)
+                cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+                
+                x = int(points2[i][0])
+                y = int(points2[i][1])
+                cv2.circle(img2, (x, y), 5, (0,255,0), -1)
+                cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
 
-    for i in range(len(points1)):
-        x = int(points1[i][0])
-        y = int(points1[i][1])
-        cv2.circle(img1, (x, y), 5, (0,255,0), -1)
-        cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
-        
-        x = int(points2[i][0])
-        y = int(points2[i][1])
-        cv2.circle(img2, (x, y), 5, (0,255,0), -1)
-        cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+            # draw the chessboard coordinate system
+            img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
+            img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
 
-    # draw the chessboard coordinate system
-    img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
-    img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
-
-    cv2.imwrite('img1.jpg', img1)
-    cv2.imwrite('img2.jpg', img2)
+            cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name, img1)
+            cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img2_name, img2)
+    
 
 def calculatePointsFromPaths(PATHS):
+    debugImage()
+
     for i in range(len(PATHS)): 
-        if i == 2:
-            print(PATHS[i])
-            
-            debugImage(i)
-            (points1, points2) = extract_matches(PATHS[i])
-            HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+        print(PATHS[i])
+        (points1, points2) = extract_matches(PATHS[i])
+        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-            print("Points 1:")
-            print(points1)
-            print("Points 2:")
-            print(points2)
+        print("Points 1:")
+        print(points1)
+        print("Points 2:")
+        print(points2)
 
-            X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
-                                points2[:HOW_MANY_POINTS,:], 
-                                movement.MOVEMENTS[i])
-            X = cv2.convertPointsFromHomogeneous(X.T)
-            X *= 100
-            X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+        X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
+                            points2[:HOW_MANY_POINTS,:], 
+                            movement.MOVEMENTS[i])
+        X = cv2.convertPointsFromHomogeneous(X.T)
+        X *= 100
+        X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
 
-            for i in range(len(X_formatted)):
-                print(i, end=" "); print(points1[i], end=" "); print(X_formatted[i])
+        for i in range(len(X_formatted)):
+            print(i, end=" "); print(points1[i], end=" "); print(X_formatted[i])
 
 def main():
     print("Calculating 3d points from matches from " + data_set + "data set...")

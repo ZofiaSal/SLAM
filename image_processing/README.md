@@ -16,7 +16,8 @@ Replace `data_set_directory` with the appropriate name.
 In the */SLAM/image_processing/test_data_sets/data_set_directory* place the 
 input photos and the *movement.py* file. In the *[...]/test_data_sets/data_set_directory/pairs_data/description.txt* place the pairs of photos (for SuperGlue). The debug output will be evaluated correctly only if you put them in alphabetical order. In the *movement.py* file put the description of the movements
 between pairs of photos placed in the *description.txt* file. **See the example __template_ directory**. The .npz files and the visualization images will be stored in 
-the *[...]/test_data_sets/data_set_directory/pairs_data* directory.
+the *[...]/test_data_sets/data_set_directory/pairs_data* directory. The debug photos
+showing found feature points will be placed in the *[...]/test_data_sets/data_set_directory/debug_matches* directory.
 
 
 <!-- Our current command:
