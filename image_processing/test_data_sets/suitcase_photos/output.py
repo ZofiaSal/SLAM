@@ -1,6 +1,4 @@
-import numpy as np
 from numpy import array
-
 
 output = [array([[-0.05870785, -0.74103713,  1.27383925],
        [ 0.06292296, -1.01487247,  1.2417161 ],
