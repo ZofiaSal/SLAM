@@ -66,8 +66,6 @@ PATHS = [os.path.join(directory_path, f)
          for f in sorted(os.listdir(directory_path)) 
          if f.endswith('.npz')]
 
-print(PATHS)
-
 # points1 - characteristic points from first picture 
 # points2 - characteristic points for corresponding points from picture two
 # movement - the change from where picture 1 was taken to where picture 2 was taken [x,z,alpha] where alpha is a clockwise rotation in XY
@@ -139,32 +137,50 @@ def debugImage():
             cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
             pathCount += 1
 
+def changeCoordinates(point, movement):
+    angle = - movement[2]
+    x_translation = - movement[0]
+    z_translation = - movement[1]
+    Rxz = np.array([[np.cos(angle), 0, -np.sin(angle)],
+                    [0, 1, 0],
+                    [np.sin(angle), 0, np.cos(angle)]])
+
+    # Apply the rotation matrix to point P
+    point_rotated = np.dot(Rxz, point)
+
+    # Translate the coordinates of P by x and z
+    return point_rotated + np.array([x_translation, 0, z_translation])
+
 def calculatePointsFromPaths(PATHS):
     debugImage()
+    points3D = []
 
     for i in range(len(PATHS)): 
-        print(PATHS[i])
         (points1, points2) = extract_matches(PATHS[i])
         HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        print("Points 1:")
-        print(points1)
-        print("Points 2:")
-        print(points2)
-
-        X = triangulatePoints(points1[:HOW_MANY_POINTS,:],
+        POINTS = triangulatePoints(points1[:HOW_MANY_POINTS,:],
                             points2[:HOW_MANY_POINTS,:], 
                             movement.MOVEMENTS[i])
-        X = cv2.convertPointsFromHomogeneous(X.T)
-        X *= 100
-        X_formatted = [[format(number, '.4f') for number in row] for row in X[:, 0, :]]
+        POINTS = cv2.convertPointsFromHomogeneous(POINTS.T)
+        POINTS_SHAPED = POINTS[:, 0, :]
 
-        for i in range(len(X_formatted)):
-            print(i, end=" "); print(points1[i], end=" "); print(X_formatted[i])
+        for j in range(HOW_MANY_POINTS):
+            POINTS_SHAPED[j] = changeCoordinates(POINTS_SHAPED[j], movement.MOVEMENTS[i])
+
+        points3D.append(np.array(POINTS_SHAPED))
+    
+    return points3D
 
 def main():
     print("Calculating 3d points from matches from " + data_set + "data set...")
-    calculatePointsFromPaths(PATHS)
+    result = calculatePointsFromPaths(PATHS)
+
+    output = './test_data_sets/' + data_set + '/output.py'
+    list_str = "output = " + repr(result)
+
+    with open(output, "w") as output_file:
+        output_file.write(list_str)
 
 if __name__ == '__main__':
     main()
