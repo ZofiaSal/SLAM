@@ -25,7 +25,7 @@ data_set = args.data
 import sys
 current_path = os.path.dirname(os.path.abspath(__file__))
 print(current_path + '/' + data_set + '/')
-sys.path.append(current_path + '/test_data_sets/' + data_set + '/')
+sys.path.append(current_path + '/test_data_sets/' + data_set + '/source_photos')
 import movement
 
 if args.md:
@@ -41,7 +41,7 @@ if args.fm:
     subprocess.run([
                     'python', 
                     '../SuperGluePretrainedNetwork/match_pairs.py', 
-                    '--input_dir', './test_data_sets/' + data_set, 
+                    '--input_dir', './test_data_sets/' + data_set + '/source_photos', 
                     '--output_dir', './test_data_sets/' + data_set + '/pairs_data',
                     '--input_pairs', './test_data_sets/' + data_set + '/pairs_data/description.txt', 
                     '--viz', '--fast_viz', # visualize the matches
@@ -103,7 +103,7 @@ def extract_matches(path):
         return points0, points1
 
 def debugImage():
-    line = 0
+    pathCount = 0
     with open('./test_data_sets/' + data_set + '/pairs_data/description.txt', 'r') as f:
         for line in f:
             # Split the line into a list of image names
@@ -113,9 +113,9 @@ def debugImage():
             img1_name = image_names[0]
             img2_name = image_names[1]
 
-            img1 = cv2.imread('./test_data_sets/' + data_set + '/' + img1_name)
-            img2 = cv2.imread('./test_data_sets/' + data_set + '/' + img2_name)
-            (points1, points2) = extract_matches(PATHS[0])
+            img1 = cv2.imread('./test_data_sets/' + data_set + '/source_photos/' + img1_name)
+            img2 = cv2.imread('./test_data_sets/' + data_set + '/source_photos/' + img2_name)
+            (points1, points2) = extract_matches(PATHS[pathCount])
             for i in range(len(points1)):
                 x = int(points1[i][0])
                 y = int(points1[i][1])
@@ -131,9 +131,13 @@ def debugImage():
             img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
             img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
 
-            cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name, img1)
-            cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img2_name, img2)
-    
+            # cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name, img1)
+            # cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img2_name, img2)
+            
+            # concatenate the images horizontally
+            debug_image = np.concatenate((img1, img2), axis=1)
+            cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
+            pathCount += 1
 
 def calculatePointsFromPaths(PATHS):
     debugImage()

@@ -13,7 +13,7 @@ args = parser.parse_args()
 # Access the arguments
 print(args.data)
 
-catalogue = './test_data_sets/' + args.data + '/'
+catalogue = './test_data_sets/' + args.data + '/source_photos'
 output_file = './test_data_sets/' + args.data + '/pairs_data/description.txt'
 
 # Get a list of files in the catalogue directory, sorted alphabetically
