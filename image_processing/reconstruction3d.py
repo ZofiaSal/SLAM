@@ -1,23 +1,19 @@
 import subprocess
-from cmath import pi
 import numpy as np
 import os
 import cv2
 import argparse
 
 # Create the parser
-parser = argparse.ArgumentParser(description='Description of your program')
+parser = argparse.ArgumentParser(description='3d reconstruction')
 
 # Add the arguments
-parser.add_argument('--fm', type=bool, help='Description of arg1')
-parser.add_argument('--data', type=str, help='Description of arg2')
+parser.add_argument('--fm', action='store_true', help='Find matches?')
+parser.add_argument('--data', type=str, help='Data set directory name')
+parser.add_argument('--md', action='store_true', help='Make description?')
 
 # Parse the arguments
 args = parser.parse_args()
-
-# Access the arguments
-print(args.fm)
-print(args.data)
 
 # INSTRUCTION:
 # put the photos in 'data_set' directory
@@ -31,6 +27,14 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 print(current_path + '/' + data_set + '/')
 sys.path.append(current_path + '/test_data_sets/' + data_set + '/')
 import movement
+
+if args.md:
+    # Run the make_description.py
+    subprocess.run([
+                    'python', 
+                    './test_data_sets/make_description.py', 
+                    '--data', data_set
+                    ])
 
 if args.fm:
     # Run the SuperGluePretrainedNetwork
