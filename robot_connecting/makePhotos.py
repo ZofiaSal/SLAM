@@ -17,7 +17,7 @@ sensor = pipeline.get_active_profile().get_device().query_sensors()[1]
 # Set the exposure anytime during the operation
 # Outside partly cloudy day -> sensor.set_option(rs.option.exposure, 1.000)
 # Inside quite bright -> sensor.set_option(rs.option.exposure, 150.000)
-sensor.set_option(rs.option.exposure, 150.000)
+sensor.set_option(rs.option.exposure, 750.000)
 
 align_to = rs.stream.color
 align = rs.align(align_to)

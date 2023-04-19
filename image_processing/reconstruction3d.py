@@ -24,7 +24,6 @@ data_set = args.data
 
 import sys
 current_path = os.path.dirname(os.path.abspath(__file__))
-print(current_path + '/' + data_set + '/')
 sys.path.append(current_path + '/test_data_sets/' + data_set + '/source_photos')
 import movement
 
@@ -46,10 +45,10 @@ if args.fm:
                     '--input_pairs', './test_data_sets/' + data_set + '/pairs_data/description.txt', 
                     '--viz', '--fast_viz', # visualize the matches
                     '--resize', '-1', # must be (do not resize the image)
-                    '--match_threshold', '0.5', # match tolerance: the more the more tolerant
+                    '--match_threshold', '0.3', # match tolerance: the more the less tolerant
                     '--shuffle', # shuffle the pairs before cutting off the list
-                    '--max_keypoints', '50', # before matching
-                    '--nms_radius', '30' # don't allow keypoints to be too close to each other
+                    '--max_keypoints', '200', # before matching
+                    '--nms_radius', '20' # don't allow keypoints to be too close to each other
                     ])
 
 # OUR FINAL CAMERA CALIBRATION MATRIX
@@ -96,7 +95,7 @@ def extract_matches(path):
     points0 = keypoints0[matches != -1]
     points1 = keypoints1[matches[matches != -1]]
     if points0.size < 8 or points1.size < 8:
-        print("Too few points to produce fundamental matrix.")
+        raise Exception('Not enough matches')
     else:
         return points0, points1
 
@@ -113,26 +112,33 @@ def debugImage():
 
             img1 = cv2.imread('./test_data_sets/' + data_set + '/source_photos/' + img1_name)
             img2 = cv2.imread('./test_data_sets/' + data_set + '/source_photos/' + img2_name)
-            (points1, points2) = extract_matches(PATHS[pathCount])
-            for i in range(len(points1)):
-                x = int(points1[i][0])
-                y = int(points1[i][1])
-                cv2.circle(img1, (x, y), 5, (0,255,0), -1)
-                cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
-                
-                x = int(points2[i][0])
-                y = int(points2[i][1])
-                cv2.circle(img2, (x, y), 5, (0,255,0), -1)
-                cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+            try :
+                points1, points2 = extract_matches(PATHS[pathCount])
 
-            # draw the chessboard coordinate system
-            img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
-            img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
-            
-            # concatenate the images horizontally
-            debug_image = np.concatenate((img1, img2), axis=1)
-            cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
+                for i in range(len(points1)):
+                    x = int(points1[i][0])
+                    y = int(points1[i][1])
+                    cv2.circle(img1, (x, y), 5, (0,255,0), -1)
+                    cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+                    
+                    x = int(points2[i][0])
+                    y = int(points2[i][1])
+                    cv2.circle(img2, (x, y), 5, (0,255,0), -1)
+                    cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+
+                # draw the chessboard coordinate system
+                img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
+                img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
+                
+                # concatenate the images horizontally
+                debug_image = np.concatenate((img1, img2), axis=1)
+                cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
+                
+            except Exception as e:
+                print(e)
+                
             pathCount += 1
+            
 
 def changeCoordinates(point, movement):
     angle = - movement[2]
@@ -153,25 +159,27 @@ def calculatePointsFromPaths(PATHS):
     points3D = []
 
     for i in range(len(PATHS)): 
-        (points1, points2) = extract_matches(PATHS[i])
-        HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
+        try :
+            (points1, points2) = extract_matches(PATHS[i])
+            HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-        POINTS = triangulatePoints(points1[:HOW_MANY_POINTS,:],
-                            points2[:HOW_MANY_POINTS,:], 
-                            movement.MOVEMENTS[i])
-        POINTS = cv2.convertPointsFromHomogeneous(POINTS.T)
-        POINTS_SHAPED = POINTS[:, 0, :]
+            POINTS = triangulatePoints(points1[:HOW_MANY_POINTS,:],
+                                points2[:HOW_MANY_POINTS,:], 
+                                movement.MOVEMENTS[i])
+            POINTS = cv2.convertPointsFromHomogeneous(POINTS.T)
+            POINTS_SHAPED = POINTS[:, 0, :]
 
-        for j in range(HOW_MANY_POINTS):
-            POINTS_SHAPED[j] = changeCoordinates(POINTS_SHAPED[j], movement.MOVEMENTS[i])
+            for j in range(HOW_MANY_POINTS):
+                POINTS_SHAPED[j] = changeCoordinates(POINTS_SHAPED[j], movement.MOVEMENTS[i])
 
-        points3D.append(np.array(POINTS_SHAPED))
+            points3D.append(np.array(POINTS_SHAPED))
+        except Exception as e:
+            print(e)
+            continue
     
     return points3D
 
 def main():
-    print(movement.MOVEMENTS)
-    
     print("Calculating 3d points from matches from " + data_set + "data set...")
     result = calculatePointsFromPaths(PATHS)
 
@@ -180,6 +188,8 @@ def main():
 
     with open(output, "w") as output_file:
         output_file.write(list_str)
+
+    print("Done!")
 
 if __name__ == '__main__':
     main()
