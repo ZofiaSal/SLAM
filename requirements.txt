@@ -1,3 +1,5 @@
-opencv-python-=4.8.0
+opencv-python >= 4.7.0
 streamlit
 watchdog
+pyrealsense2
+pyrealsense2-macosx
