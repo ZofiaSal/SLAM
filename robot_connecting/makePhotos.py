@@ -25,6 +25,22 @@ align = rs.align(align_to)
 
 message = "Press only enter to make another photo, press anything and enter to exit\n"
 
+def int_to_three_digit_string(i):
+    # Convert the integer to a string
+    s = str(i)
+    
+    # If the string is already 3 characters long, return it
+    if len(s) == 3:
+        return s
+    
+    # If the string is less than 3 characters long, pad it with leading zeros
+    elif len(s) < 3:
+        return s.zfill(3)
+    
+    # If the string is more than 3 characters long, return the last 3 characters
+    else:
+        return s[-3:]
+
 i = 0; 
 key =  input(message)
 while(key == ""):
@@ -37,7 +53,7 @@ while(key == ""):
     image = np.asanyarray(frame.get_data())
 
     # Filename 
-    imageName = './' + 'photo_' + str(i) + "_"+str(date.today())+'.jpg'
+    imageName = './' + 'photo_' + int_to_three_digit_string(i) + "_"+str(date.today())+'.jpg'
 
     # Saving the image 
     cv2.imwrite(imageName, image) 
