@@ -1,0 +1,7 @@
+first photo in relation to second:
+6cm to the right, 6.8cm forward, 30deg anticlockwise
+
+cube on the first photo:
+-1.15cm, 16cm
+cube on second photo:
+-3cm, 20cm
