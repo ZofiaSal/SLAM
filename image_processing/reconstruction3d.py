@@ -46,7 +46,7 @@ if args.fm:
                     '--input_pairs', './test_data_sets/' + data_set + '/pairs_data/description.txt', 
                     '--viz', '--fast_viz', # visualize the matches
                     '--resize', '-1', # must be (do not resize the image)
-                    '--match_threshold', '0.3', # match tolerance: the more the more tolerant
+                    '--match_threshold', '0.5', # match tolerance: the more the more tolerant
                     '--shuffle', # shuffle the pairs before cutting off the list
                     '--max_keypoints', '50', # before matching
                     '--nms_radius', '30' # don't allow keypoints to be too close to each other
@@ -128,9 +128,6 @@ def debugImage():
             # draw the chessboard coordinate system
             img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
             img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
-
-            # cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img1_name, img1)
-            # cv2.imwrite('./test_data_sets/' + data_set + '/debug_matches/' + img2_name, img2)
             
             # concatenate the images horizontally
             debug_image = np.concatenate((img1, img2), axis=1)
@@ -173,11 +170,13 @@ def calculatePointsFromPaths(PATHS):
     return points3D
 
 def main():
+    print(movement.MOVEMENTS)
+    
     print("Calculating 3d points from matches from " + data_set + "data set...")
     result = calculatePointsFromPaths(PATHS)
 
     output = './test_data_sets/' + data_set + '/output.py'
-    list_str = "output = " + repr(result)
+    list_str = "from numpy import array\n\noutput = " + repr(result)
 
     with open(output, "w") as output_file:
         output_file.write(list_str)
