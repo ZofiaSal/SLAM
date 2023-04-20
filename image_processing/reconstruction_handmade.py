@@ -53,29 +53,75 @@ def changeCoordinates(point, movement):
     return point_rotated + np.array([x_translation, 0, z_translation])
 
 
-MOVEMENTS = np.array([[- 6., - 6.8, - pi / 6]])
+def extract_matches(path):
+    data = np.load(path)
+    matches = data['matches']
+    keypoints0 = data['keypoints0']
+    keypoints1 = data['keypoints1']
+    points0 = keypoints0[matches != -1]
+    points1 = keypoints1[matches[matches != -1]]
+    if points0.size < 8 or points1.size < 8:
+        raise Exception('Not enough matches')
+    else:
+        return points0, points1
 
+def debugImage(directory_path):
+    PATHS = [os.path.join(directory_path + "/pairs_data/", f) 
+         for f in sorted(os.listdir(directory_path + "/pairs_data/")) 
+         if f.endswith('.npz')]
 
-# Create the parser
-parser = argparse.ArgumentParser(description='3d reconstruction')
+    pathCount = 0
+    with open(directory_path + '/pairs_data/description.txt', 'r') as f:
+        for line in f:
+            # Split the line into a list of image names
+            image_names = line.strip().split()
+            
+            # Assign the image names to two separate variables
+            img1_name = image_names[0]
+            img2_name = image_names[1]
 
-# Add the arguments
-parser.add_argument('--data', type=str, help='Data set directory name')
+            img1 = cv2.imread(directory_path + '/source_photos/' + img1_name)
+            img2 = cv2.imread(directory_path + '/source_photos/' + img2_name)
+            try :
+                points1, points2 = extract_matches(PATHS[pathCount])
 
-# Parse the arguments
-args = parser.parse_args()
-data_set = args.data
+                for i in range(len(points1)):
+                    x = int(points1[i][0])
+                    y = int(points1[i][1])
+                    cv2.circle(img1, (x, y), 5, (0,255,0), -1)
+                    cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+                    
+                    x = int(points2[i][0])
+                    y = int(points2[i][1])
+                    cv2.circle(img2, (x, y), 5, (0,255,0), -1)
+                    cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
+
+                # draw the chessboard coordinate system
+                img1 = cv2.drawFrameAxes(img1, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
+                img2 = cv2.drawFrameAxes(img2, cameraMatrix, distCoeffs, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), 0.1)
+                
+                # concatenate the images horizontally
+                debug_image = np.concatenate((img1, img2), axis=1)
+                cv2.imwrite(directory_path + '/debug_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
+                
+            except Exception as e:
+                print("For pictures " + img1_name + " and " + img2_name + " occured an error: " + str(e))
+                
+            pathCount += 1
 
 # File needs to be called points_pairs.py 
 # and have a variable called points which is an array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
-def calculatePointsFromPaths(directory = data_set):
+# File movement.py needs to have a variable called MOVEMENTS which is an array of movements (x, y, angle) for each pair of images.
+def calculatePointsFromFile(directory_path):
+    
+    debugImage(directory_path)
     points3D = []
 
-    current_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(current_path + "/test_data_sets/" + directory + "/handmade_matches")
+    
+    sys.path.append(directory_path + "/handmade_matches")
     import points_pairs as pp  
 
-    sys.path.append(current_path + "/test_data_sets/" + directory + "/source_photos")
+    sys.path.append(directory_path + "/source_photos")
     import movement 
    
     MOVEMENTS = movement.MOVEMENTS
@@ -101,13 +147,26 @@ def calculatePointsFromPaths(directory = data_set):
 
             points3D.append(np.array(POINTS_SHAPED))
         except Exception as e:
-            print("in test number " + str(i) + " occured an error: " + str(e))
+            print("In test number " + str(i) + " occured an error: " + str(e))
             continue
     
     return points3D
 
 def main():
-    print(calculatePointsFromPaths())
+    # Create the parser
+    parser = argparse.ArgumentParser(description='3d reconstruction')
+
+    # Add the arguments
+    parser.add_argument('--data', type=str, help='Data set directory name')
+
+    # Parse the arguments
+    args = parser.parse_args()
+    data_set = args.data
+
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    directory_path = current_path + "/test_data_sets/" + data_set
+    
+    print(calculatePointsFromFile(directory_path))
 
 if __name__ == '__main__':
     main()
