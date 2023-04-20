@@ -65,11 +65,8 @@ def extract_matches(path):
     else:
         return points0, points1
 
-def debugImage(directory_path):
-    PATHS = [os.path.join(directory_path + "/pairs_data/", f) 
-         for f in sorted(os.listdir(directory_path + "/pairs_data/")) 
-         if f.endswith('.npz')]
-
+# Writes to '/debug_handmade_matches/' images with the matches drawn on them for all pairs of photos listed in '/pairs_data/description.txt' 
+def debugImage(directory_path, points_sets):
     pathCount = 0
     with open(directory_path + '/pairs_data/description.txt', 'r') as f:
         for line in f:
@@ -83,7 +80,7 @@ def debugImage(directory_path):
             img1 = cv2.imread(directory_path + '/source_photos/' + img1_name)
             img2 = cv2.imread(directory_path + '/source_photos/' + img2_name)
             try :
-                points1, points2 = extract_matches(PATHS[pathCount])
+                points1, points2 = points_sets[pathCount]
 
                 for i in range(len(points1)):
                     x = int(points1[i][0])
@@ -102,7 +99,7 @@ def debugImage(directory_path):
                 
                 # concatenate the images horizontally
                 debug_image = np.concatenate((img1, img2), axis=1)
-                cv2.imwrite(directory_path + '/debug_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
+                cv2.imwrite(directory_path + '/handmade_matches/debug_handmade_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
                 
             except Exception as e:
                 print("For pictures " + img1_name + " and " + img2_name + " occured an error: " + str(e))
@@ -113,21 +110,16 @@ def debugImage(directory_path):
 # and have a variable called points which is an array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
 # File movement.py needs to have a variable called MOVEMENTS which is an array of movements (x, y, angle) for each pair of images.
 def calculatePointsFromFile(directory_path):
-    
-    debugImage(directory_path)
-    points3D = []
-
-    
     sys.path.append(directory_path + "/handmade_matches")
     import points_pairs as pp  
-
     sys.path.append(directory_path + "/source_photos")
     import movement 
    
     MOVEMENTS = movement.MOVEMENTS
-
     points_sets = pp.points 
-
+    debugImage(directory_path, points_sets)
+    points3D = []
+    
     for i in range(len(points_sets)): 
         try :
             (points1, points2) = points_sets[i]
