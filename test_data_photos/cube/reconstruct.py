@@ -1,8 +1,11 @@
 from cmath import pi
 import subprocess
+import sys
 import numpy as np
 import os
 import cv2
+
+
 
 # OUR FINAL CAMERA CALIBRATION MATRIX
 calibration = 0.6442544274536695
@@ -50,29 +53,38 @@ def changeCoordinates(point, movement):
     # Translate the coordinates of P by x and z
     return point_rotated + np.array([x_translation, 0, z_translation])
 
+
 MOVEMENTS = np.array([[- 6., - 6.8, - pi / 6]])
 
-def calculatePointsFromPaths():
+def calculatePointsFromPaths(path  = "./" ):
     points3D = []
 
-    for i in range(1): 
-        try :
-            points1 = np.array([[594, 429], [593, 97], [359, 135], [360, 419],
-                                [744, 412], [745, 157], [532, 182], [532, 406]])  
+    current_path = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(current_path + path)
+    import points_pairs as pp  
+   
+    # array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
+    points_sets = pp.points 
 
-            points2 = np.array([[524, 415], [523, 147], [251, 146], [251, 416],
-                                [553, 402], [553, 194], [342, 193], [342, 403]])
+
+    for i in range(len(points_sets)): 
+        try :
+            (points1, points2) = points_sets[i]
+
+            if points1.size != points2.size:
+                raise Exception("The number of points in the two images is not the same")
 
             HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
+            # TODO change to MOVEMENTS[i] when we have more movements!!!!
             POINTS = triangulatePoints(points1[:HOW_MANY_POINTS,:],
                                 points2[:HOW_MANY_POINTS,:], 
-                                MOVEMENTS[i])
+                                MOVEMENTS[0]) 
             POINTS = cv2.convertPointsFromHomogeneous(POINTS.T)
             POINTS_SHAPED = POINTS[:, 0, :]
 
             for j in range(HOW_MANY_POINTS):
-                POINTS_SHAPED[j] = changeCoordinates(POINTS_SHAPED[j], MOVEMENTS[i])
+                POINTS_SHAPED[j] = changeCoordinates(POINTS_SHAPED[j], MOVEMENTS[0])
 
             points3D.append(np.array(POINTS_SHAPED))
         except Exception as e:
