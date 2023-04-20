@@ -56,6 +56,8 @@ def changeCoordinates(point, movement):
 
 MOVEMENTS = np.array([[- 6., - 6.8, - pi / 6]])
 
+# File needs to be called points_pairs.py 
+# and have a variable called points which is an array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
 def calculatePointsFromPaths(path  = "./" ):
     points3D = []
 
@@ -63,7 +65,6 @@ def calculatePointsFromPaths(path  = "./" ):
     sys.path.append(current_path + path)
     import points_pairs as pp  
    
-    # array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
     points_sets = pp.points 
 
 
