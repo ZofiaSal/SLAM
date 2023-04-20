@@ -5,8 +5,6 @@ import numpy as np
 import os
 import cv2
 
-
-
 # OUR FINAL CAMERA CALIBRATION MATRIX
 calibration = 0.6442544274536695
 cameraMatrix = np.array([[932.35252209,   0.,         657.24325896],
