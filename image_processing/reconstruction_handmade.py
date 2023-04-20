@@ -74,7 +74,12 @@ def calculatePointsFromPaths(directory = data_set):
     current_path = os.path.dirname(os.path.abspath(__file__))
     sys.path.append(current_path + "/test_data_sets/" + directory + "/handmade_matches")
     import points_pairs as pp  
+
+    sys.path.append(current_path + "/test_data_sets/" + directory + "/source_photos")
+    import movement 
    
+    MOVEMENTS = movement.MOVEMENTS
+
     points_sets = pp.points 
 
     for i in range(len(points_sets)): 
@@ -85,10 +90,9 @@ def calculatePointsFromPaths(directory = data_set):
 
             HOW_MANY_POINTS = min(HOW_MANY_POINTS_DEFAULT, len(points1))
 
-            # TODO change to MOVEMENTS[i] when we have more movements!!!!
             POINTS = triangulatePoints(points1[:HOW_MANY_POINTS,:],
                                 points2[:HOW_MANY_POINTS,:], 
-                                MOVEMENTS[0]) 
+                                MOVEMENTS[i]) 
             POINTS = cv2.convertPointsFromHomogeneous(POINTS.T)
             POINTS_SHAPED = POINTS[:, 0, :]
 
