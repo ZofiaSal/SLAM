@@ -4,7 +4,7 @@
 
 Run the reconstruction:
 
-`python reconstructionHandmade.py --data 'data_set_directory'`
+`python reconstruction_handmade.py --data 'data_set_directory'`
 
 Replace `data_set_directory` with the appropriate name.
 The `data_set_directory` should be placed in _/SLAM/image_processing/test_data_sets_.
