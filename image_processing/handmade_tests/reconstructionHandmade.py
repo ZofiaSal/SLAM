@@ -65,7 +65,6 @@ def calculatePointsFromPaths(path  = "./" ):
    
     points_sets = pp.points 
 
-
     for i in range(len(points_sets)): 
         try :
             (points1, points2) = points_sets[i]

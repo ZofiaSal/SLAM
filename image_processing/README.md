@@ -1,6 +1,6 @@
 # SLAM - image processing: 3D reconstruction
 
-## Finding matches
+## 3D reconstruction from SuperGlue matches
 
 Clone the SuperGlue repo in the _/SLAM/_ directory: 
 
