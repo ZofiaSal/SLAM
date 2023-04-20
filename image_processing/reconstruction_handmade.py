@@ -67,7 +67,6 @@ def extract_matches(path):
 
 # Writes to '/debug_handmade_matches/' images with the matches drawn on them for all pairs of photos listed in '/pairs_data/description.txt' 
 def debugImage(directory_path, points_sets):
-
     pathCount = 0
     with open(directory_path + '/pairs_data/description.txt', 'r') as f:
         for line in f:
@@ -100,7 +99,7 @@ def debugImage(directory_path, points_sets):
                 
                 # concatenate the images horizontally
                 debug_image = np.concatenate((img1, img2), axis=1)
-                cv2.imwrite(directory_path + '/debug_handmade_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
+                cv2.imwrite(directory_path + '/handmade_matches/debug_handmade_matches/' + img1_name[:-4] + '_' + img2_name[:-4] + '.png', debug_image)
                 
             except Exception as e:
                 print("For pictures " + img1_name + " and " + img2_name + " occured an error: " + str(e))
@@ -111,19 +110,14 @@ def debugImage(directory_path, points_sets):
 # and have a variable called points which is an array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
 # File movement.py needs to have a variable called MOVEMENTS which is an array of movements (x, y, angle) for each pair of images.
 def calculatePointsFromFile(directory_path):
-    
     sys.path.append(directory_path + "/handmade_matches")
     import points_pairs as pp  
-
     sys.path.append(directory_path + "/source_photos")
     import movement 
    
     MOVEMENTS = movement.MOVEMENTS
-
     points_sets = pp.points 
-    
     debugImage(directory_path, points_sets)
-
     points3D = []
     
     for i in range(len(points_sets)): 
