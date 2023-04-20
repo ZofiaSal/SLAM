@@ -4,6 +4,7 @@ import sys
 import numpy as np
 import os
 import cv2
+import argparse
 
 # OUR FINAL CAMERA CALIBRATION MATRIX
 calibration = 0.6442544274536695
@@ -54,13 +55,24 @@ def changeCoordinates(point, movement):
 
 MOVEMENTS = np.array([[- 6., - 6.8, - pi / 6]])
 
+
+# Create the parser
+parser = argparse.ArgumentParser(description='3d reconstruction')
+
+# Add the arguments
+parser.add_argument('--data', type=str, help='Data set directory name')
+
+# Parse the arguments
+args = parser.parse_args()
+data_set = args.data
+
 # File needs to be called points_pairs.py 
 # and have a variable called points which is an array of pairs (array1, array2) where array1 are points from first image and array2 are points from second image.
-def calculatePointsFromPaths(path  = "./" ):
+def calculatePointsFromPaths(directory = data_set):
     points3D = []
 
     current_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(current_path + path)
+    sys.path.append(current_path + "/test_data_sets/" + directory + "/handmade_matches")
     import points_pairs as pp  
    
     points_sets = pp.points 
@@ -68,7 +80,6 @@ def calculatePointsFromPaths(path  = "./" ):
     for i in range(len(points_sets)): 
         try :
             (points1, points2) = points_sets[i]
-
             if points1.size != points2.size:
                 raise Exception("The number of points in the two images is not the same")
 
@@ -86,7 +97,7 @@ def calculatePointsFromPaths(path  = "./" ):
 
             points3D.append(np.array(POINTS_SHAPED))
         except Exception as e:
-            print(e)
+            print("in test number " + str(i) + " occured an error: " + str(e))
             continue
     
     return points3D
