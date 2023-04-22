@@ -18,29 +18,25 @@ import output
 # EKF state covariance
 Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)]) ** 2
 Cx2 = np.diag([0.5, 0.5, 0.5, np.deg2rad(30.0)]) ** 2
-#Qx = np.diag([0.05, 0.05, 0.5]) ** 2
 
 #  Simulation parameter -> expected noise based on device parameteres?
 Q_sim = np.diag([0.2, np.deg2rad(1.0), 0.02]) ** 2
 R_sim = np.diag([1.0, np.deg2rad(10.0)]) ** 2
 
-# landmarks in our world
-# RFID = np.array([[-1.0, 3.0, 0],
-#                 [2.0, 0.5, 0],
-#                 [2.0, 5.0, 0]
-#                 ])
-
 DT = 0.1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 MAX_RANGE = 4.0  # maximum observation range
-M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
+M_DIST_TH = 0.5  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 3  # LM state size [x,y,z]
 
 show_animation = True
 
 def calc_movement():
-    return np.array([17.35*np.sin(10*2*np.pi/360)*2, - np.pi / 9])
+    u = np.array([
+        [17.35*math.sin(10*2*np.pi/360)*2],
+       [ - np.pi / 9]])
+    return u
 
 
 def search_correspond_landmark_id(xAug, PAug, zi):
@@ -77,12 +73,10 @@ def ekf_slam(xEst, PEst, u, z):
 
     # Update
     for iz in range(len(z[:, 0])):  # for each observation
-        #id = z[iz, LM_SIZE]
         id = search_correspond_landmark_id(xEst, PEst, z[iz, 0:LM_SIZE])
 
         nLM = calc_n_lm(xEst)
         if id == nLM:
-            #print("New LM")
             # Extend state and covariance matrix
             xAug = np.vstack((xEst, calc_landmark_position(xEst, z[iz, :])))
             PAug = np.vstack((np.hstack((PEst, np.zeros((len(xEst), LM_SIZE)))),
@@ -106,11 +100,11 @@ def motion_model(x, u):
                   [0, 1.0, 0],
                   [0, 0, 1.0]])
 
-    B = np.array([[DT * math.cos(x[2, 0]), 0],
-                  [DT * math.sin(x[2, 0]), 0],
-                  [0.0, DT]])
-
-    x = (F @ x) + (B @ u)
+    new_angle = (u[1] + x[2])[0]
+    delta = np.array(
+        [ u[0] * math.cos(new_angle), u[0] * math.sin(new_angle), u[1] ]
+    )
+    x = (F @ x) + delta #(B @ u)
     return x
 
 
@@ -189,49 +183,14 @@ def pi_2_pi(angle):
 
 # we assume observations are sorted by index
 def new_movement_observations(u):
-    # posX = 0 
-    # posY = (0.1)*new_movement_observations.iterator # in every move it moves 1 in Y direction
-    # posZ = 0
-    # posAngle = np.pi/2 
-    # # add noise to gps x-y
-    # z = np.zeros((0, LM_SIZE+1))
-
-    # # landmarks in our world
-    # RFID = np.array([[-1.0, 3.0,0],
-    #                  [2.0, 0.5, 0],
-    #                  [2.0, 5.0,0]
-    #                  ])
-
-    # # we assume robots Z coord never changes
-    # for i in range(len(RFID[:, 0])):
-    #     dx = RFID[i, 0] - posX
-    #     dy = RFID[i, 1] - posY
-    #     dz = RFID[i, 2] - posZ 
-    #     d = math.hypot(dx, dy)          #real distance
-    #     angle = pi_2_pi(math.atan2(dy, dx) - posAngle) #real angle
-    #     zi = []
-    #     if d <= MAX_RANGE:
-    #         # counting noise for landmarks position
-    #         dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # observed distance (real with noise)
-    #         angle_n = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # observed angle (real with noise)
-    #         dzn = dz + np.random.randn() * Q_sim[2, 2] ** 0.5
-    #         zi = np.array([dn, angle_n, dz, i])
-    #         #zi = np.array([d, angle, dz, i])
-    #         z = np.vstack((z, zi))
-    
     new_movement_observations.iterator += 1
-
-    #u = np.array([17.35*np.sin(10*2*np.pi/360)*2, - np.pi / 9])
-    
-    # add noise to movement so its how we think we're moving (info from wheels or sth)
-    u_with_noise = np.array([[
+    u_with_noise = np.array([
         u[0] + np.random.randn() * R_sim[0, 0] ** 0.5,
-        u[1] + np.random.randn() * R_sim[1, 1] ** 0.5]]).T
+        u[1] + np.random.randn() * R_sim[1, 1] ** 0.5])
 
     return u_with_noise, output.output[new_movement_observations.iterator]
 new_movement_observations.iterator = 0
 
-import time
 def main():
     print(__file__ + " start!!")
 
@@ -260,7 +219,7 @@ def main():
         # predicted position based only on movement
         xDR = motion_model(xDR, u)
 
-        #xEst, PEst = ekf_slam(xEst, PEst, u, z)
+        xEst, PEst = ekf_slam(xEst, PEst, u, z)
 
         x_state = xEst[0:STATE_SIZE]
 
@@ -276,7 +235,6 @@ def main():
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-            #plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(xEst[0], xEst[1], ".r")
 
             # plot landmark
@@ -289,7 +247,7 @@ def main():
             plt.plot(hxEst[0, :],
                      hxEst[1, :], "-r")
             plt.plot(hxTrue[0, :],
-                      hxTrue[1, :], "-b")
+                      hxTrue[1, :], "-g")
 
             plt.axis("equal")
             plt.grid(True)
