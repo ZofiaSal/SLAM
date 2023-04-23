@@ -1,0 +1,11 @@
+photo00 - cube is (0., 160.) from camera.
+photo01 - cube is (30., 160.) from camera.
+photo02 - cube is (-20., 160.) from camera.
+
+photo03 - (-20., 160.) from first camera, camera is 1 movement foreward.
+photo04 - (0., 160.) from first camera, camera is 1 movement foreward.
+photo05 - (30., 160.) from first camera, camera is 1 movement foreward.
+
+photo06 - (-20., 160.) from first camera, camera is 1 movement backward.
+photo07 - (0., 160.) from first camera, camera is 1 movement backward.
+photo08 - (30., 160.) from first camera, camera is 1 movement backward.

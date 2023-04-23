@@ -19,6 +19,13 @@ HOW_MANY_POINTS_DEFAULT = 1000
 # points2 - characteristic points for corresponding points from picture two
 # movement - the change from where picture 1 was taken to where picture 2 was taken [x,z,alpha] where alpha is a clockwise rotation in XY
 def triangulatePoints(points1, points2, movement, intrinsicCamera = cameraMatrix):
+    print("triangulate1: ", end="")
+    print(repr(points1))
+    print("triangulate2: ", end="")
+    print(repr(points2))
+    print("movement: ", end="")
+    print(movement)
+
     angle = movement[2]
 
     # R[I|-C]
@@ -83,15 +90,23 @@ def debugImage(directory_path, points_sets):
             try :
                 points1, points2 = points_sets[pathCount]
 
+                print("debug_image1: ", end="")
+                print(repr(points1))
+                print("debug_image2: ", end="")
+                print(repr(points2))
+
+                colors = [[0, 0, 255], [0, 255, 0], [255, 0, 0], [255, 255, 0], [255, 0, 255], [0, 255, 255], [255, 255, 255], [0, 0, 0]]
+
                 for i in range(len(points1)):
                     x = int(points1[i][0])
                     y = int(points1[i][1])
-                    cv2.circle(img1, (x, y), 5, (0,255,0), -1)
+                    
+                    cv2.circle(img1, (x, y), 5, colors[i % len(colors)], -1)
                     cv2.putText(img1, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
                     
                     x = int(points2[i][0])
                     y = int(points2[i][1])
-                    cv2.circle(img2, (x, y), 5, (0,255,0), -1)
+                    cv2.circle(img2, (x, y), 5, colors[i % len(colors)], -1)
                     cv2.putText(img2, str(i) + ":" + str(x) + "," + str(y), (x+10, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 1, cv2.LINE_AA)
 
                 # draw the chessboard coordinate system
@@ -139,6 +154,8 @@ def calculatePointsFromFile(directory_path):
                                 MOVEMENTS[i]) 
             POINTS = cv2.convertPointsFromHomogeneous(POINTS.T)
             POINTS_SHAPED = POINTS[:, 0, :]
+
+            print("Points from triangulation: " + repr(POINTS_SHAPED))
 
             for j in range(HOW_MANY_POINTS):
                 POINTS_SHAPED[j] = changeCoordinates(POINTS_SHAPED[j], MOVEMENTS[0])
