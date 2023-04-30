@@ -10,24 +10,19 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
+import sys
+import os
+
 # EKF state covariance
 Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)]) ** 2
 #Qx = np.diag([0.05, 0.05, 0.5]) ** 2
 
 #  Simulation parameter -> expected noise based on device parameteres?
 Q_sim = np.diag([0.2, np.deg2rad(1.0), 0.02]) ** 2
-R_sim = np.diag([1.0, np.deg2rad(10.0)]) ** 2
+R_sim = np.diag([0.3, np.deg2rad(4.0)]) ** 2
 
-# landmarks in our world
-RFID = np.array([[-1.0, 3.0, 0],
-                [2.0, 0.5, 0],
-                [2.0, 5.0, 0]
-                ])
-
-DT = 0.1  # time tick [s]
+DT = 1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
-MAX_RANGE = 4.0  # maximum observation range
-M_DIST_TH = 2.0  # Threshold of Mahalanobis distance for data association.
 STATE_SIZE = 3  # State size [x,y,yaw]
 LM_SIZE = 2  # LM state size [x,y,z]
 
@@ -44,6 +39,9 @@ def ekf_slam(xEst, PEst, u, z):
 
 
     # Update
+    if(z.size == 0):
+        return xEst, PEst
+
     for iz in range(len(z[:, 0])):  # for each observation
         id = z[iz, LM_SIZE]
 
@@ -58,6 +56,8 @@ def ekf_slam(xEst, PEst, u, z):
             PEst = PAug
         lm = get_landmark_position_from_state(xEst, id)
         y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:(LM_SIZE)], int(id))
+
+        print(y)
 
         K = (PEst @ H.T) @ np.linalg.inv(S)
         xEst = xEst + (K @ y)
@@ -148,75 +148,74 @@ def jacob_h(q, delta, x, i):
 def pi_2_pi(angle):
     return (angle + math.pi) % (2 * math.pi) - math.pi
 
+# to enforce the correccntess of the indexes of the landmarks.
+mapping_landmarks_to_indexes = {}
 
-# we assume observations are sorted by index
+# returns distance, angle and index of the ladnmark
+def tuple_to_list(t):
+    if t[0] not in mapping_landmarks_to_indexes:
+        mapping_landmarks_to_indexes[t[0]] = len(mapping_landmarks_to_indexes)
+        # [distance, angle, index]
+    return [t[1][1], t[1][0], mapping_landmarks_to_indexes[t[0]]] 
+
+def diagonal_length(x, y):
+    return math.sqrt(x**2 + y**2)
+
+# getting observations from the image processing
+current_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(current_path + "/../" + "image_processing/landmarks/")
+
+import generated3dPoints as points
+observations = points.points4
+for i in range(len(observations)):
+    observations[i] = list(filter(lambda point: point[0] in [50] , observations[i]))
+real_movement = np.array([[diagonal_length(points.XMOVEMENT, points.ZMOVEMENT) ,points.ROTATION]])
+
+SIM_TIME = len(observations) - 1
+
+# generator for observations and movement possible with noise 
 def new_movement_observations():
-    posX = 0 
-    posY = (0.1)*new_movement_observations.iterator # in every move it moves 1 in Y direction
-    posZ = 0
-    posAngle = np.pi/2 
-    # add noise to gps x-y
-    z = np.zeros((0, LM_SIZE+1))
-
-    # landmarks in our world
-    RFID = np.array([[-1.0, 3.0,0],
-                     [2.0, 0.5, 0],
-                     [2.0, 5.0,0]
-                     ])
-
-    # we assume robots Z coord never changes
-    for i in range(len(RFID[:, 0])):
-        dx = RFID[i, 0] - posX
-        dy = RFID[i, 1] - posY
-        dz = RFID[i, 2] - posZ 
-        d = math.hypot(dx, dy)          #real distance
-        angle = pi_2_pi(math.atan2(dy, dx) - posAngle) #real angle
-        zi = []
-        if d <= MAX_RANGE:
-            # counting noise for landmarks position
-            dn = d + np.random.randn() * Q_sim[0, 0] ** 0.5  # observed distance (real with noise)
-            angle_n = angle + np.random.randn() * Q_sim[1, 1] ** 0.5  # observed angke (real with noise)
-            dzn = dz + np.random.randn() * Q_sim[2, 2] ** 0.5
-            zi = np.array([dn, angle_n, i])
-            #zi = np.array([d, angle, dz, i])
-            z = np.vstack((z, zi))
-    
+    if new_movement_observations.iterator >= len(observations):
+        return None, None
     new_movement_observations.iterator += 1
 
-    u = np.array([1,0])
+    u = real_movement[0]
+
     
     # add noise to movement so its how we think we're moving (info from wheels or sth)
     u_with_noise = np.array([[
         u[0] + np.random.randn() * R_sim[0, 0] ** 0.5,
         u[1] + np.random.randn() * R_sim[1, 1] ** 0.5]]).T
 
-    return u_with_noise, z
+    observation_current = observations[new_movement_observations.iterator - 1]
+    obs = np.array(list(map(tuple_to_list, observation_current)))
+    return u_with_noise, obs
 new_movement_observations.iterator = 0
 
 def main():
-    print(__file__ + " start!!")
+    print("\n" + __file__ + " start!!")
 
     time = 0.0
 
     # State Vector [x y yaw v]'
     xEst = np.zeros((STATE_SIZE, 1)) # Gauss mean
-    # xEst[2,0]= np.pi/2 # only for our symulation
     xTrue = np.zeros((STATE_SIZE, 1)) # real position
     PEst = np.eye(STATE_SIZE)       # covariance
 
     xDR = np.zeros((STATE_SIZE, 1))  # Dead reckoning -> simulated position with noise (without observations)
 
     # history
-    hxEst = xEst
-    hxTrue = xTrue
-    hxDR = xTrue
+    hxEst = np.zeros((STATE_SIZE, 1))
+    hxTrue = np.zeros((STATE_SIZE, 1))
+    hxDR = np.zeros((STATE_SIZE, 1))
 
     while SIM_TIME >= time:
         time += DT
         u, z = new_movement_observations()
 
-        xTrue = motion_model(xTrue, u) # real position based on movement
-        # predicted position based only on movement
+        xTrue = motion_model(xTrue, real_movement.T) # real position based on real movement
+        
+        # predicted position based only on movement with noise
         xDR = motion_model(xDR, u)
 
         xEst, PEst = ekf_slam(xEst, PEst, u, z)
@@ -235,13 +234,16 @@ def main():
                 'key_release_event',
                 lambda event: [exit(0) if event.key == 'escape' else None])
 
-            plt.plot(RFID[:, 0], RFID[:, 1], "*k")
             plt.plot(xEst[0], xEst[1], ".r")
 
             # plot landmark
             for i in range(calc_n_lm(xEst)):
                 plt.plot(xEst[STATE_SIZE + i * LM_SIZE],
                          xEst[STATE_SIZE + i * LM_SIZE + 1], "xg")
+
+            #print(hxTrue)
+            #print(hxDR)
+            #print(hxEst)
 
             plt.plot(hxTrue[0, :],
                      hxTrue[1, :], "-b")
@@ -251,7 +253,7 @@ def main():
                      hxEst[1, :], "-r")
             plt.axis("equal")
             plt.grid(True)
-            plt.pause(1)
+            plt.pause(5)
 
 
 if __name__ == '__main__':
