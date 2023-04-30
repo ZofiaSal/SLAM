@@ -19,12 +19,12 @@ Cx = np.diag([0.5, 0.5, np.deg2rad(30.0)]) ** 2
 
 #  Simulation parameter -> expected noise based on device parameteres?
 Q_sim = np.diag([0.2, np.deg2rad(1.0), 0.02]) ** 2
-R_sim = np.diag([0.3, np.deg2rad(4.0)]) ** 2
+R_sim = np.diag([0.05, np.deg2rad(0.05)]) ** 2
 
 DT = 1  # time tick [s]
 SIM_TIME = 50.0  # simulation time [s]
 STATE_SIZE = 3  # State size [x,y,yaw]
-LM_SIZE = 2  # LM state size [x,y,z]
+LM_SIZE = 2  # LM state size [x,y]
 
 show_animation = True
 
@@ -54,14 +54,15 @@ def ekf_slam(xEst, PEst, u, z):
                               np.hstack((np.zeros((LM_SIZE, len(xEst))), initP))))
             xEst = xAug
             PEst = PAug
-        lm = get_landmark_position_from_state(xEst, id)
-        y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:(LM_SIZE)], int(id))
+        else:
+            lm = get_landmark_position_from_state(xEst, id)
+            y, S, H = calc_innovation(lm, xEst, PEst, z[iz, 0:(LM_SIZE)], int(id))
 
-        print(y)
+            print(y)
 
-        K = (PEst @ H.T) @ np.linalg.inv(S)
-        xEst = xEst + (K @ y)
-        PEst = (np.eye(len(xEst)) - (K @ H)) @ PEst
+            K  = (PEst @ H.T) @ np.linalg.inv(S)
+            xEst = xEst + (K @ y)
+            PEst = (np.eye(len(xEst)) - (K @ H)) @ PEst
 
     xEst[2] = pi_2_pi(xEst[2])
 
@@ -189,7 +190,7 @@ def new_movement_observations():
 
     observation_current = observations[new_movement_observations.iterator - 1]
     obs = np.array(list(map(tuple_to_list, observation_current)))
-    return u_with_noise, obs
+    return real_movement.T, obs
 new_movement_observations.iterator = 0
 
 def main():
