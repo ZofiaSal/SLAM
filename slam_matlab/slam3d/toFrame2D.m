@@ -22,9 +22,9 @@ if nargout > 1
         [       0,       0,                                   0]];
 
     PR_p = [...
-      [cos(a)   , sin(a)]
-      [-sin(a)  , cos(a)]
-      [0        , 0]];
+      [cos(a)   , sin(a), 0]
+      [-sin(a)  , cos(a), 0]
+      [0        , 0     , 1]];
 end
 
 end

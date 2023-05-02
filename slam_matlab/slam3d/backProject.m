@@ -1,18 +1,18 @@
 function [p, P_r, P_y] = backProject(r, y)
 
 if nargout == 1
-    
+
     p_r = invScan(y);
     p   = fromFrame2D(r, p_r);
 
 else
-    
+
     [p_r, PR_y]    = invScan(y);
-    [p, P_r, P_pr] = fromFrame2D(r, p_r);
-    
+    [p, P_r, P_pr] = fromFrame3D(r, p_r);
+
     % here the chain rule !
     P_y = P_pr * PR_y;
-        
+
 end
 
 end

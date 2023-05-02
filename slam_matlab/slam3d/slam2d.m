@@ -4,14 +4,16 @@
 %
 %   0. System def.
 
-LM_SIZE = 3
+LM_SIZE = 3;
 
 % System noise
 q = [0.01;0.005];
 Q = diag(q.^2);
+
 % Measurement noise
-m = [.15; 1*pi/180];
+m = [.15; 1*pi/180; .015];
 M = diag(m.^2);
+
 % randn('seed',1);
 
 %
@@ -21,13 +23,13 @@ M = diag(m.^2);
 R = [0;-2.5;0];
 u = [0.1;0.05];
 W = cloister(-4,4,-4,4);
-y = zeros(2,size(W,2));
+y = zeros(LM_SIZE, size(W,2));
 
 %   2. Estimator
 x = zeros(numel(R)+numel(W), 1);
 P = zeros(numel(x),numel(x));
 mapspace = 1:numel(x);
-l = zeros(2, size(W,2));
+l = zeros(LM_SIZE, size(W,2));
 
 r = find(mapspace,numel(R));
 mapspace(r) = 0;
@@ -87,7 +89,7 @@ for t = 1:200
     n = q.*randn(2,1);
     R = move(R, u, zeros(2,1));
     for lid = 1:size(W,2)
-        v = m.*randn(2,1);
+        v = m.*randn(3,1);
         y(:,lid) = project(R, W(:,lid)) + v;
     end
 
@@ -135,7 +137,7 @@ for t = 1:200
     % check lmk availability
     lid = find(l(1,:)==0 , 1);
     if ~isempty(lid)
-        s = find(mapspace, 2);
+        s = find(mapspace, LM_SIZE);
         if ~isempty(s)
             mapspace(s) = 0;
             l(:,lid) = s';

@@ -1,38 +1,55 @@
-function [X,Y] = cov2elli(x,P,ns,NP)
+function f = cloister(xmin,xmax,ymin,ymax,n)
 
-% COV2ELLI  Ellipse points from mean and covariances matrix.
-%   [X,Y] = COV2ELLI(X0,P,NS,NP) returns X and Y coordinates of the NP
-%   points of the the NS-sigma bound ellipse of the Gaussian defined by
-%   mean X0 and covariances matrix P.
+% CLOISTER  Generates features in a 2D cloister shape.
+%   CLOISTER(XMIN,XMAX,YMIN,YMAX,N) generates a 2D cloister in the limits
+%   indicated as parameters.
 %
-%   The ellipse can be plotted in a 2D graphic by just creating a line
-%   with line(X,Y).
+%   N is the number of rows and columns; it defaults to N = 9.
 %
-%   See also COV3ELLI, LINE.
+%   See also THICKCLOISTER.
 
 %   Copyright 2008-2009 Joan Sola @ LAAS-CNRS.
 
-
-persistent circle
-
-if isempty(circle)
-    alpha = 2*pi/NP*(0:NP);
-    circle = [cos(alpha);sin(alpha)];
+if nargin < 5
+    n = 9;
 end
 
-% SVD method, R*d*d*R' = P
-% [R,D]=svd(P);
-% d = sqrt(D);
-% % circle -> aligned ellipse -> rotated ellipse -> ns-ellipse
-% ellip = ns*R*d*circle;
+x0 = (xmin+xmax)/2;
+y0 = (ymin+ymax)/2;
 
-% Choleski method, C*C' = P
-C = chol(P)';
-ellip = ns*C*circle;
+hsize = xmax-xmin;
+vsize = ymax-ymin;
+tsize = diag([hsize vsize]);
 
-% output ready for plotting (X and Y line vectors)
-X = x(1)+ellip(1,:);
-Y = x(2)+ellip(2,:);
+midle  = (n-5)/2;
+int    = (n-3)/2;
+ext    = (n-1)/2;
+cmidle = [-midle:midle];
+cint   = [cmidle int];
+cext   = [-int cint];
+zint   = zeros(1,n-3);
+zext   = zeros(1,n-2);
+
+northint = [cint;zint+int];
+northext = [cext;zext+ext];
+
+southint = [-cint;zint-int];
+southext = [-cext;zext-ext];
+
+eastint  = [zint+int;-cint];
+eastext  = [zext+ext;-cext];
+
+westint  = [zint-int;cint];
+westext  = [zext-ext;cext];
+
+
+f = [northint northext southint southext eastint eastext westint westext];
+
+f = tsize*f/(n-1);
+
+f(1,:) = f(1,:) + x0;
+f(2,:) = f(2,:) + y0;
+f(3,:) = 0;
 
 
 
@@ -60,7 +77,7 @@ Y = x(2)+ellip(2,:);
 %
 %---------------------------------------------------------------------
 
-%   SLAMTB is Copyright 2007,2008,2009 
+%   SLAMTB is Copyright 2007,2008,2009
 %   by Joan Sola, David Marquez and Jean Marie Codol @ LAAS-CNRS.
 %   See on top of this file for its particular copyright.
 
