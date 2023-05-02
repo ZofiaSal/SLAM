@@ -1,4 +1,4 @@
-function [p_r, PR_r, PR_p] = toFrame2D(r, p)
+function [p_r, PR_r, PR_p] = toFrame3D(r, p)
 
 p_xy = p(1:2);
 t = r(1:2);
