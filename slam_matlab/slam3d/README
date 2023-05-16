@@ -1,0 +1,4 @@
+To provide observations of landmarks and movement change data.m and run slam3d in octave.
+
+To run octave :
+octave --gui 

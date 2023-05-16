@@ -4,17 +4,20 @@ function [landmarks, u, NUMBER_OF_LANDMARKS] = data(i=0)
 % the map is a containers.Map object, where the key is the landmark id 
 % and value is the landmark coordinates[dx, alpha, dz] from robots perspective.
 % ids in the map are in the range [1, NUMBER_OF_LANDMARKS].
+
+%example data 
+
+%movement, can be different for each image. 
 u = [1;0];
 
 NUMBER_OF_LANDMARKS = 2;
-NUMBER_OF_IMAGES = 3;
 landmarks = containers.Map('KeyType','int32','ValueType','any');
+
 
 if nargout > 2
     return;
 end
 
-%observed_coordinates =[[[sqrt(2), pi/4, 0];[sqrt(2), -pi/4, 0]];[[1, pi/2,0];[1, -pi/2,0]];[[sqrt(2), 3*pi/4, 0];[sqrt(2), -3*pi/4, 0]]];
 observed_coordinates =[[3 0 0];[4 0 0]];
 observed_coordinates(:,:,2) = [[2 0 0];[3 0 0]];
 observed_coordinates(:,:,3) = [[1  0  0];[2  0 0]];
