@@ -13,11 +13,12 @@ u = [1;0];
 NUMBER_OF_LANDMARKS = 2;
 landmarks = containers.Map('KeyType','int32','ValueType','any');
 
-
-if nargout > 2
+% it's matlab, so we start from 1 so zero is just to ask for max number of landmarks.
+if i == 0
     return;
 end
 
+%example landmark observations
 observed_coordinates =[[3 0 0];[4 0 0]];
 observed_coordinates(:,:,2) = [[2 0 0];[3 0 0]];
 observed_coordinates(:,:,3) = [[1  0  0];[2  0 0]];
