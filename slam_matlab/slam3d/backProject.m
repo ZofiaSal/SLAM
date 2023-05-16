@@ -1,5 +1,4 @@
 function [p, P_r, P_y] = backProject(r, y)
-
 if nargout == 1
 
     p_r = invScan(y);

@@ -1,5 +1,5 @@
-function [ro, RO_r, RO_n] = move(r, u, n, dt)
-% dt is not used by this function.
+function [ro, RO_r, RO_n] = move(r, u, n =zeros(2,1) )
+% n is potentially adding noise to the motion
 
 a = r(3);
 dx = u(1) + n(1);

@@ -1,5 +1,5 @@
 function [p_r, PR_r, PR_p] = toFrame3D(r, p)
-
+% transforms point P from global frame to frame r (to r being center of coordinate)
 p_xy = p(1:2);
 t = r(1:2);
 a = r(3);

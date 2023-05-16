@@ -4,7 +4,12 @@
 %
 %   0. System def.
 
+% [dx,angle,z]
 LM_SIZE = 3;
+
+%getting data  
+[dummy, dummy, NUMBER_OF_LANDMARKS] = data();
+SIZE_OF_ALL_LANDMARKS = LM_SIZE * NUMBER_OF_LANDMARKS;
 
 % System noise
 q = [0.01;0.005];
@@ -21,15 +26,18 @@ M = diag(m.^2);
 %       R: robot pose u: control
 
 R = [0;-2.5;0];
-u = [0.1;0.05];
+% change control ?!
+u = [1;0.00];
+% real landmarks coordinates
 W = cloister(-4,4,-4,4);
-y = zeros(LM_SIZE, size(W,2));
+y = zeros(LM_SIZE, NUMBER_OF_LANDMARKS);
 
 %   2. Estimator
-x = zeros(numel(R)+numel(W), 1);
+x = zeros(numel(R)+SIZE_OF_ALL_LANDMARKS, 1);
 P = zeros(numel(x),numel(x));
-mapspace = 1:numel(x);
-l = zeros(LM_SIZE, size(W,2));
+mapspace = 1:numel(x); %map management
+%l = zeros(LM_SIZE, size(W,2)); %pointers to landmarks in x
+l = zeros(LM_SIZE, NUMBER_OF_LANDMARKS); %pointers to landmarks in x
 
 r = find(mapspace,numel(R));
 mapspace(r) = 0;
@@ -41,12 +49,6 @@ mapFig = figure(1);
 cla;
 axis([-6 6 -6 6])
 axis square
-WG = line('parent',gca,...
-    'linestyle','none',...
-    'marker','o',...
-    'color','r',...
-    'xdata',W(1,:),...
-    'ydata',W(2,:));
 RG = line('parent',gca,...
     'marker','.',...
     'color','r',...
@@ -85,18 +87,18 @@ reG = line(...
 
 for t = 1:200
 
-    % 1. Simulator
-    n = q.*randn(2,1);
-    R = move(R, u, zeros(2,1));
-    for lid = 1:size(W,2)
-        v = m.*randn(3,1);
-        y(:,lid) = project(R, W(:,lid)) + v;
-    end
+    % 0. Get data
+    % y -> map of measurements of landmarks 
+    % u -> control
+    [y,u] = data(t);
 
+    % 1. Simulator
+    R = move(R, u);
+    
     % 2. Filter
     %   a. Prediction
     %   CAUTION this is sub-optimal in CPU time
-    [x(r), R_r, R_n] = move(x(r), u, n);
+    [x(r), R_r, R_n] = move(x(r), u);
     P_rr = P(r,r);
     P(r,:) = R_r*P(r,:);
     P(:,r) = P(r,:)';
@@ -104,16 +106,22 @@ for t = 1:200
 
     %   b. correction
     %       i. known lmks
-    lids = find(l(1,:));
+    lids = find(l(1,:)); % find(X) returns a vector containing the linear indices of each nonzero element in array X
     for lid = lids
+        
+        %if not observed skip
+        if  isKey(y,lid) == 0
+            continue;
+        end
+
+        display('known landmark');
         % expectation
         [e, E_r, E_l] = project(x(r), x(l(:,lid)));
         E_rl = [E_r E_l];
         rl   = [r l(:,lid)'];
-        E    = E_rl * P(rl,rl) * E_rl';
-
+        E    = E_rl * P(rl,rl) * E_rl'; 
         % measurement
-        yi = y(:,lid);
+        yi = y(lid);
 
         % innovation
         z = yi - e;
@@ -135,16 +143,28 @@ for t = 1:200
 
     %       ii. init new lmks
     % check lmk availability
-    lid = find(l(1,:)==0 , 1);
-    if ~isempty(lid)
+    %lid = find(l(1,:)==0 , 1); %find(X,n) returns the first n indices corresponding to the nonzero elements in X.
+    % so lid is a first empty landmark(not observed yet)
+
+    % for each observations add if its not already in the map.
+    for el = keys(y)
+        lid = el{1}; 
+
+        % skip if we already know this landmark.
+        if l(1,lid)!=0
+            continue;
+        end
+        display('new landmark');
+
         s = find(mapspace, LM_SIZE);
         if ~isempty(s)
             mapspace(s) = 0;
-            l(:,lid) = s';
-            % measurement
-            yi = y(:,lid);
+            l(:,lid) = s'; % ' is the transpose operator'
 
-            [x(l(:,lid)), L_r, L_y] = backProject(x(r), yi);
+            % measurement
+            yi = y(lid);
+
+            [x(l(:,lid)), L_r, L_y] = backProject(x(r), yi); % 
             P(s,:) = L_r * P(r,:);
             P(:,s) = P(s,:)';
             P(s,s) = L_r * P(r,r) * L_r' + L_y * M * L_y';
@@ -172,6 +192,7 @@ for t = 1:200
         set(reG,'xdata',X,'ydata',Y);
     end
     drawnow;
+    pause(1);
 end
 
 
