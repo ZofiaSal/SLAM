@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import numpy as np
 from give_only_seen import only_seen_points
 
@@ -25,6 +26,7 @@ def changeCoordinates(point, movement):
 
     # Translate the coordinates of P by x and z
     result = point_rotated + np.array([x_translation, 0, z_translation])
+
     return result
 
 def changeCoordinatesOfAll(points, movement):
@@ -38,18 +40,22 @@ def changeToCylindricalCoordinates(point):
     x = point[0]
     y = point[1]
     z = point[2]
-    d = np.sqrt(x**2 + z**2)
+    d = np.sqrt(x ** 2 + z ** 2)
     phi = -np.arctan2(x, z)
     return np.array([d, phi * 180 / np.pi, y])
 
 points_from_staircase = []
-XCOORS = [0.7, 2.34, 3.26, 4.39, 4.99, 4.59, 2.66, 1.17, -1.37, -3.48, -2.26, -4.64]
+XCOORS = [0.7, 2.34, 3.26, 4.39, 4.99, 4.59, 2.66, 1.17, -1.37, -2.26, -3.48, -4.64]
 
 for i in range(len(XCOORS)):
     mul = -1.
     if i < 5:
         mul = 1.
     points_from_staircase.append([XCOORS[i], mul * np.sqrt(25 - XCOORS[i] * XCOORS[i]), 0.5])
+
+# Extract X and Y coordinates from the points
+XCOORSPLOT = [point[0] for point in points_from_staircase]
+YCOORSPLOT = [point[1] for point in points_from_staircase]
 
 print(points_from_staircase)
 
@@ -144,3 +150,27 @@ with open("circle_points.csv", "w") as file:
         
         # Add an empty line between each set of data
         file.write("\n")
+
+ROBOT_POINTS = []
+
+for i in range(12):
+    ang = 20 * (i + 1)
+    last_position = [-R * np.cos(ang * np.pi / 180), 
+                    0.0, 
+                    R * np.sin(ang * np.pi / 180)]
+    ROBOT_POINTS.append(last_position)
+
+X_ROBOT = [point[0] for point in ROBOT_POINTS]
+Y_ROBOT = [point[2] for point in ROBOT_POINTS]
+for i in range(len(X_ROBOT)):
+    XCOORSPLOT.append(X_ROBOT[i])
+    YCOORSPLOT.append(Y_ROBOT[i])
+
+# Plot the points with equal aspect ratio
+plt.scatter(XCOORSPLOT, YCOORSPLOT)
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Points on XY Plane')
+plt.grid(True)
+plt.gca().set_aspect('equal', adjustable='box')  # Set equal aspect ratio
+plt.show()
