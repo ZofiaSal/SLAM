@@ -42,7 +42,7 @@ def changeToCylindricalCoordinates(point):
     z = point[2]
     d = np.sqrt(x ** 2 + z ** 2)
     phi = -np.arctan2(x, z)
-    return np.array([d, phi * 180 / np.pi, y])
+    return np.array([d, phi, y])
 
 points_from_staircase = []
 XCOORS = [0.7, 2.34, 3.26, 4.39, 4.99, 4.59, 2.66, 1.17, -1.37, -2.26, -3.48, -4.64]

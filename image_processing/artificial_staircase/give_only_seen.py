@@ -10,6 +10,7 @@ distCoeffs = np.array([[ 1.76279343e-01, -6.07952723e-01, -4.64176532e-04, -4.96
 
 # The function will return the points that are seen by the camera.
 def only_seen_points(points3D):
+    print("")
     result = []
     for i in range(len(points3D)):
         point3D = points3D[i]
@@ -17,7 +18,15 @@ def only_seen_points(points3D):
             point2d = cv2.projectPoints(point3D, np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 1.0]), cameraMatrix, distCoeffs)
             point2d = point2d[0].reshape(-1, 2)
             point2d = point2d.astype(int)
+            print(point2d, end="")
             if point2d[0][0] > 0 and point2d[0][0] < 1280 and point2d[0][1] > 0 and point2d[0][1] < 720:
                 result.append(point3D)
+                print(" <---", end="")
+                print(point3D)
+            else: 
+                print(point3D)
+        else:
+            print("behind", end="")
+            print(point3D)
 
     return np.array(result)
