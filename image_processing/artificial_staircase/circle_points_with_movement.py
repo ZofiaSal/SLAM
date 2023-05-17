@@ -124,7 +124,7 @@ with open("circle_points.csv", "w") as file:
     forward = round(2 * R * np.sin(10 * np.pi / 180), 3)
     angle = round(- 20 * np.pi / 180, 3)
     file.write(str(forward) + "," + str(angle) + "\n")
-    file.write("81\n")
+    file.write("15\n")
     if len(all_points) == 0:
         print("ALERT\n")
     for points, ids in zip(all_points, all_points_ids):
