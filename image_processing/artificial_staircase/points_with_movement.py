@@ -1,4 +1,5 @@
 import numpy as np
+from give_only_seen import only_seen_points
 
 # 'point' is a numpy array of shape (3,) representing a point in 3D space,
 # with origin of the coordinate system in the (0, 0, 0) point.
@@ -8,9 +9,9 @@ import numpy as np
 # We assume the rotation is performed first, then the translation.
 # The rotation is performed around the Y axis.
 def changeCoordinates(point, movement):
-    angle = -movement[2]
-    x_translation = -movement[0]
-    z_translation = -movement[1]
+    angle = - movement[2]
+    x_translation = - movement[0]
+    z_translation = - movement[1]
     Rxz = np.array(
         [
             [np.cos(angle), 0, -np.sin(angle)],
@@ -24,6 +25,11 @@ def changeCoordinates(point, movement):
 
     # Translate the coordinates of P by x and z
     return point_rotated + np.array([x_translation, 0, z_translation])
+
+def changeCoordinatesOfAll(points, movement):
+    for i in range(len(points)):
+        points[i] = changeCoordinates(points[i], movement)
+    return points
 
 # change to cylindrical coordinates, having X and Z as radius and Y as height.
 # Y axis goes down, X axis goes right, Z axis goes forward.
@@ -66,10 +72,7 @@ for i in range(len(points_from_staircase)):
     z = points_from_staircase[i][2]
     points_from_staircase[i] = np.array([x, -z, y])
 
-# starting position (X, Y, Z):
-START = [- np.cos(20 * np.pi / 180) * 0.9, 0.03, np.sin(20 * np.pi / 180) * 0.9]
-
-# movement leading to starting position [X, Z, ROTATION]
+# movement leading (from [0, 0, 0]) to starting position [X, Z, ROTATION]
 START_MOVEMENT = [
     - np.cos(10 * np.pi / 180) * 0.9,
     - np.sin(10 * np.pi / 180) * 0.9,
@@ -82,48 +85,67 @@ for i in range(len(points_from_staircase)):
         points_from_staircase[i], START_MOVEMENT
     )
 
-# change coordinates from staircase to cylindrical
-for i in range(len(points_from_staircase)):
-    points_from_staircase[i] = changeToCylindricalCoordinates(points_from_staircase[i])
+R = 0.9
+MOVEMENT = [- 2 * R * np.sin(10 * np.pi / 180) * np.sin(20 * np.pi / 180), 
+            2 * R * np.sin(10 * np.pi / 180) * np.cos(20 * np.pi / 180), 
+            - 20 * np.pi / 180]
 
-# capturing the result
-print("points from staircase:")
-print("POINTS = np.array([")
-for i in range(len(points_from_staircase)):
-    print(
-        "    ["
-        + str(np.round(points_from_staircase[i][0], 3))
-        + ", "
-        + str(np.round(points_from_staircase[i][1], 3))
-        + ", "
-        + str(np.round(points_from_staircase[i][2], 3))
-        + "],",
-        end=" ",
-    )
-    if (i + 1) % 5 == 0:
-        print()
-print("\n])")
+MOVEMENTS = []
 
+for i in range(1, 10):
+    MOVEMENTS.append(MOVEMENT)
 
-# RESULT [distance, angle, height]
-POINTS = np.array([
-    [10.193, 48.027, 0.0], [9.828, -168.721, 0.0], [10.071, -127.551, 0.0], [10.427, 8.358, 0.0], [8.314, 52.297, 1.0], 
-    [6.949, 56.994, 1.0], [8.314, 52.297, -5.0], [6.949, 56.994, -5.0], [9.782, -3.126, -1.8], [9.718, 3.437, -1.8], 
-    [9.782, -3.126, -3.5], [9.718, 3.437, -3.5], [5.705, 20.864, -0.82], [6.219, 27.275, -1.62], [5.212, 30.047, -2.12], 
-    [4.672, 22.55, -1.32], [5.984, 12.034, -1.5], [6.393, 18.855, -2.29], [5.355, 19.936, -2.79], [4.94, 11.767, -2.0], 
-    [9.379, -157.069, -0.35], [9.314, -147.873, -0.35], [9.379, -157.069, -1.55], [9.314, -147.873, -1.55], [9.405, -141.773, -1.55], 
-    [9.405, -141.773, -0.35], [9.733, -133.0, -0.35], [9.733, -133.0, -1.55], [7.587, -170.477, 0.5], [9.257, -160.295, 0.5], 
-    [7.587, -170.477, -2.5], [9.257, -160.295, -2.5], [9.257, -160.295, -1.0], [7.587, -170.477, -1.0], [8.389, -164.88, -0.25], 
-    [8.389, -164.88, -1.75], [5.163, -116.551, 0.0], [5.62, -130.826, 0.0], [6.08, -114.79, -0.35], [5.551, -115.733, -0.92], 
-    [4.253, -119.071, -0.35], [4.776, -117.503, 0.92], [5.266, -132.703, 0.92], [3.157, 166.971, -0.2], [3.157, 166.971, -1.5], 
-    [3.947, 176.925, -1.0], [4.571, 166.361, -1.0], [3.934, 166.581, -1.22], [3.635, 173.655, -0.69], [3.157, 166.971, -0.68], 
-    [3.448, 68.667, 2.0], [4.856, 70.508, 0.0], [3.757, 69.19, 1.57], [4.377, 70.015, 0.69], [5.364, 70.934, -0.73], 
-    [5.9, 71.304, -1.48], [4.631, 70.288, 0.33], [2.263, 102.187, 0.0], [2.048, 64.299, 0.0], [3.443, 80.447, -0.5], 
-    [3.158, 68.469, -0.4], [2.944, 99.889, -0.23], [4.502, -52.699, -0.85], [4.855, -63.635, -0.56], [4.787, -48.772, -1.19], 
-    [4.73, -65.798, -1.69], [5.908, -58.33, -1.8], [3.16, 116.513, -1.0], [3.179, 112.913, -0.5], [2.661, 115.859, 0.5], 
-    [3.027, 139.448, -0.5], [5.867, -94.318, -1.0], [5.543, -30.944, 0.0], [5.206, -38.568, -0.13], [4.857, -56.078, -0.39], 
-    [5.019, -75.104, -0.67], [4.881, -66.917, -0.55], [3.456, -0.344, 0.0], [2.702, -26.221, 0.0], [2.702, -26.221, 0.0], 
-    [2.635, -50.118, 0.0], 
-])
+def get_ids(all_points, taken_points):
+    result = []
+    n = 0
+    i = 0
+    while i < len(taken_points):
+        if taken_points[i][0] == all_points[n][0] and \
+           taken_points[i][1] == all_points[n][1] and \
+           taken_points[i][2] == all_points[n][2]:
+            result.append(n + 1)
+            i += 1
+        n += 1
+    return result
 
-print(POINTS.shape)
+all_points = []
+all_points_ids = []
+points_to_append = only_seen_points(points_from_staircase)
+all_points_ids.append(get_ids(points_from_staircase, points_to_append))
+for j in range(len(points_to_append)):
+    points_to_append[j] = changeToCylindricalCoordinates(points_to_append[j])
+all_points.append(points_to_append)
+
+for i in range (len(MOVEMENTS)):
+    points_from_staircase = changeCoordinatesOfAll(points_from_staircase, MOVEMENTS[i])
+    points_to_append = only_seen_points(points_from_staircase)
+    all_points_ids.append(get_ids(points_from_staircase, points_to_append))
+    for j in range(len(points_to_append)):
+        points_to_append[j] = changeToCylindricalCoordinates(points_to_append[j])
+    all_points.append(points_to_append)
+
+with open("points.csv", "w") as file:
+    forward = round(2 * R * np.sin(10 * np.pi / 180), 3)
+    angle = round(- 20 * np.pi / 180, 3)
+    file.write(str(forward) + "," + str(angle) + "\n")
+    file.write("81\n")
+    for points, ids in zip(all_points, all_points_ids):
+        # Write IDs separated by commas
+        ids_str = ",".join(str(id) for id in ids)
+        file.write(ids_str + "\n")
+        
+         # Round x, y, and z coordinates to three decimal places
+        x_coords = [round(point[0], 3) for point in points]
+        y_coords = [round(point[1], 3) for point in points]
+        z_coords = [round(point[2], 3) for point in points]
+        
+        x_coords_str = ",".join(str(coord) for coord in x_coords)
+        y_coords_str = ",".join(str(coord) for coord in y_coords)
+        z_coords_str = ",".join(str(coord) for coord in z_coords)
+        
+        file.write(x_coords_str + "\n")
+        file.write(y_coords_str + "\n")
+        file.write(z_coords_str)
+        
+        # Add an empty line between each set of data
+        file.write("\n")

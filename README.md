@@ -2,12 +2,11 @@
 Bachelor's thesis project 
 
 
+## branch 3d_testing: artificial staircase
+
 What do we need to change:
 
 - abstract out getting controls and observations where each observation is [d,ang,z,i] where d is distance on XY plane, ang is angle between front of a robot and observation, z is the Z coord of landmark and i is and index of landmark.
-
-
-
 
 What even is here?
 
