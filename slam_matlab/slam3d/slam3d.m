@@ -7,8 +7,13 @@
 % [dx,angle,z]
 LM_SIZE = 3;
 
-%getting data  
-[dummy, dummy, NUMBER_OF_LANDMARKS] = data();
+%getting data 
+%CHANGE THIS NAME TO THE NAME OF THE FILE YOU WANT TO USE
+%DESCRIPTION OF THE FILE STRUCTRUCTURE IS IN THE README FILE
+filename = "dataObs.csv";
+data_from_file = csvread(filename);
+
+[dummy, dummy, NUMBER_OF_LANDMARKS] = data(data_from_file);
 SIZE_OF_ALL_LANDMARKS = LM_SIZE * NUMBER_OF_LANDMARKS;
 
 % System noise
@@ -90,7 +95,7 @@ for t = 1:200
     % 0. Get data
     % y -> map of measurements of landmarks 
     % u -> control
-    [y,u] = data(t);
+    [y,u] = data(data_from_file,t);
 
     % 1. Simulator
     R = move(R, u);
