@@ -33,12 +33,12 @@ if  numel(last)==0
     last = numel(indexes) + 1;
 end
 
-indexes = indexes(1:last-1);
-observed_coordinates = dataObs(1:last-1, begining+1:begining+3);
+indexes = indexes(1:last-1)
+observed_coordinates = dataObs(1:last-1, begining+1:begining+3)
 
 for j = 1:numel(indexes)
     landmark = observed_coordinates(j,:);
-    landmarks(j) = landmark';
+    landmarks(indexes(j)) = landmark';
 end
 
 

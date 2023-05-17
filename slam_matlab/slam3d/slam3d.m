@@ -10,38 +10,31 @@ LM_SIZE = 3;
 %getting data 
 %CHANGE THIS NAME TO THE NAME OF THE FILE YOU WANT TO USE
 %DESCRIPTION OF THE FILE STRUCTRUCTURE IS IN THE README FILE
-filename = "dataObs.csv";
+filename = "data/circle_points.csv";
 data_from_file = csvread(filename);
 
 [dummy, dummy, NUMBER_OF_LANDMARKS] = data(data_from_file);
 SIZE_OF_ALL_LANDMARKS = LM_SIZE * NUMBER_OF_LANDMARKS;
 
 % System noise
-q = [0.01;0.005];
+q = [0.01;0.05];
 Q = diag(q.^2);
 
 % Measurement noise
 m = [.15; 1*pi/180; .015];
 M = diag(m.^2);
 
-% randn('seed',1);
-
 %
 %   1. Simulator
 %       R: robot pose u: control
 
-R = [0;-2.5;0];
-% change control ?!
-u = [1;0.00];
-% real landmarks coordinates
-W = cloister(-4,4,-4,4);
+R = [0;0;0];
 y = zeros(LM_SIZE, NUMBER_OF_LANDMARKS);
 
 %   2. Estimator
 x = zeros(numel(R)+SIZE_OF_ALL_LANDMARKS, 1);
 P = zeros(numel(x),numel(x));
 mapspace = 1:numel(x); %map management
-%l = zeros(LM_SIZE, size(W,2)); %pointers to landmarks in x
 l = zeros(LM_SIZE, NUMBER_OF_LANDMARKS); %pointers to landmarks in x
 
 r = find(mapspace,numel(R));
@@ -52,7 +45,8 @@ P(r,r) = 0;
 %   3. Graphics
 mapFig = figure(1);
 cla;
-axis([-6 6 -6 6])
+size = 10;
+axis([-size size -size size])
 axis square
 RG = line('parent',gca,...
     'marker','.',...
@@ -73,7 +67,7 @@ lG = line('parent',gca,...
     'xdata',[],...
     'ydata',[]);
 
-eG = zeros(1,size(W,2));
+eG = zeros(1,NUMBER_OF_LANDMARKS);
 for i = 1:numel(eG)
     eG(i) = line(...
         'parent', gca,...
@@ -99,11 +93,13 @@ for t = 1:200
 
     % 1. Simulator
     R = move(R, u);
+    % noise added to the control for movement 
+    n = q.*randn(2,1);
     
     % 2. Filter
     %   a. Prediction
     %   CAUTION this is sub-optimal in CPU time
-    [x(r), R_r, R_n] = move(x(r), u);
+    [x(r), R_r, R_n] = move(x(r), u,n);
     P_rr = P(r,r);
     P(r,:) = R_r*P(r,:);
     P(:,r) = P(r,:)';
@@ -120,6 +116,8 @@ for t = 1:200
         end
 
         display('known landmark');
+        display(lid);
+
         % expectation
         [e, E_r, E_l] = project(x(r), x(l(:,lid)));
         E_rl = [E_r E_l];
@@ -160,6 +158,7 @@ for t = 1:200
             continue;
         end
         display('new landmark');
+        display(lid);
 
         s = find(mapspace, LM_SIZE);
         if ~isempty(s)
@@ -185,7 +184,7 @@ for t = 1:200
     ly = x(l(2,lids));
     set(lG, 'xdata', lx, 'ydata', ly);
     for lid = lids
-        le = x(l(:,lid));
+        le = x(l(:,lid))
         LE = P(l(:,lid),l(:,lid));
         [X,Y] = cov2elli(le,LE,3,16);
         set(eG(lid),'xdata',X,'ydata',Y);
@@ -197,7 +196,7 @@ for t = 1:200
         set(reG,'xdata',X,'ydata',Y);
     end
     drawnow;
-    pause(1);
+    pause(3);
 end
 
 

@@ -1,4 +1,4 @@
-function [ro, RO_r, RO_n] = move(r, u, n =zeros(2,1) )
+function [ro, RO_r, RO_n] = move(r, u, n = zeros(2,1) )
 % n is potentially adding noise to the motion
 
 a = r(3);
