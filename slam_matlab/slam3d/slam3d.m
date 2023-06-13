@@ -16,8 +16,10 @@ data_from_file = csvread(filename);
 [dummy, dummy, NUMBER_OF_LANDMARKS] = data(data_from_file);
 SIZE_OF_ALL_LANDMARKS = LM_SIZE * NUMBER_OF_LANDMARKS;
 
+max_loop=200;
+
 % System noise
-q = [0.01;0.05];
+q = [0.1;0.3];
 Q = diag(q.^2);
 
 % Measurement noise
@@ -30,6 +32,7 @@ M = diag(m.^2);
 
 R = [0;0;0];
 y = zeros(LM_SIZE, NUMBER_OF_LANDMARKS);
+x_no_slam = R;
 
 %   2. Estimator
 x = zeros(numel(R)+SIZE_OF_ALL_LANDMARKS, 1);
@@ -45,7 +48,7 @@ P(r,r) = 0;
 %   3. Graphics
 mapFig = figure(1);
 cla;
-size = 10;
+size = 7;
 axis([-size size -size size])
 axis square
 RG = line('parent',gca,...
@@ -67,6 +70,39 @@ lG = line('parent',gca,...
     'xdata',[],...
     'ydata',[]);
 
+
+%past real positions
+prG = zeros(1,max_loop);
+for i = 1:numel(prG)
+    prG(i) = line(...
+        'parent', gca,...
+        'marker','.',...
+        'color','r',...
+        'xdata',[],...
+        'ydata',[]);
+end
+%past no slam positions
+pnG = zeros(1,max_loop);
+for i = 1:numel(pnG)
+    pnG(i) = line(...
+        'parent', gca,...
+        'marker','.',...
+        'color','g',...
+        'xdata',[],...
+        'ydata',[]);
+end
+
+%past our positions
+poG = zeros(1,max_loop);
+for i = 1:numel(poG)
+    poG(i) = line(...
+        'parent', gca,...
+        'marker','.',...
+        'color','b',...
+        'xdata',[],...
+        'ydata',[]);
+end
+
 eG = zeros(1,NUMBER_OF_LANDMARKS);
 for i = 1:numel(eG)
     eG(i) = line(...
@@ -82,9 +118,12 @@ reG = line(...
     'xdata',[],...
     'ydata',[]);
 
-% II. Temporal loop
+past_real_pos = zeros(2,0);
+past_no_slam_pos = zeros(2,0);
+past_our_pos = zeros(2,0);
 
-for t = 1:200
+% II. Temporal loop
+for t = 1:max_loop
 
     % 0. Get data
     % y -> map of measurements of landmarks 
@@ -95,7 +134,8 @@ for t = 1:200
     R = move(R, u);
     % noise added to the control for movement 
     n = q.*randn(2,1);
-    
+    x_no_slam = move(x_no_slam, u,n);
+
     % 2. Filter
     %   a. Prediction
     %   CAUTION this is sub-optimal in CPU time
@@ -177,8 +217,17 @@ for t = 1:200
 
     % 3. Graphics
 
+    for i = 1:(t-1)
+        set(prG(i), 'xdata', past_real_pos(1,i), 'ydata', past_real_pos(2,i));
+        set(pnG(i), 'xdata', past_no_slam_pos(1,i), 'ydata', past_no_slam_pos(2,i));
+        set(poG(i), 'xdata', past_our_pos(1,i), 'ydata', past_our_pos(2,i));
+    end
     set(RG, 'xdata', R(1), 'ydata', R(2));
     set(rG, 'xdata', x(r(1)), 'ydata', x(r(2)));
+    past_real_pos = [past_real_pos R(1:2)];
+    past_our_pos = [past_our_pos x(r(1:2))];
+    past_no_slam_pos = [past_no_slam_pos x_no_slam(1:2)];
+
     lids = find(l(1,:));
     lx = x(l(1,lids));
     ly = x(l(2,lids));
@@ -196,7 +245,7 @@ for t = 1:200
         set(reG,'xdata',X,'ydata',Y);
     end
     drawnow;
-    pause(3);
+    pause(2);
 end
 
 
