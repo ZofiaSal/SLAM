@@ -1,0 +1,12 @@
+[firstRobotPoistionX, firstRobotPoistionY]
+numberOfAllLAndmarks
+...
+i, j (id's of landmarks observed in kth moment)  
+observationOfILandmarkX, observationOfJLandmarkX 
+observationOfILandmarkY, observationOfJLandmarkY 
+observationOfILandmarkZ, observationOfJLandmarkZ 
+i (id's of landmarks observed in (k+1)th moment)  
+observationOfILandmarkX
+observationOfILandmarkY
+observationOfILandmarkZ
+...

@@ -1,4 +1,6 @@
-To provide observations of landmarks and movement change data.m and run slam3d in octave.
+To provide observations of landmarks and movement change name of the file in slam3d and run slam3d in octave.
+
+Example of the file structure is in ./data/example.csv
 
 To run octave :
 octave --gui 
