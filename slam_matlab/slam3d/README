@@ -2,5 +2,8 @@ To provide observations of landmarks and movement change name of the file in sla
 
 Example of the file structure is in ./data/example.csv
 
-To run octave :
-octave --gui 
+To run octave:
+octave --gui ./slam3d.m
+
+The code is based on tutorial availiable on:
+http://www.joansola.eu
