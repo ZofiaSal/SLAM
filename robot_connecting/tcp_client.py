@@ -10,9 +10,6 @@ import threading
 import sys
 import termios
 import tty 
-import re
-
-from datetime import datetime
 
 class ClientSocket:
     def __init__(self, ip, port):
@@ -28,15 +25,15 @@ class ClientSocket:
 
     def command(self):
         buf = ""
+        # Configure keystroke capture.
         stdin = sys.stdin.fileno()
         tattr = termios.tcgetattr(stdin)
 
         try:
             tty.setcbreak(stdin, termios.TCSANOW)
             sys.stdout.flush()
-
+            # Read command from keyboard.
             while True:
-                #print('xd')
                 buf += sys.stdin.read(1)
                 if (buf[-1] == "a"): 
                     data = "TurnLeft"
@@ -84,11 +81,13 @@ class ClientSocket:
             self.connectServer()
 
     def receiveImage(self):
+        # Get data from robot.
         action = self.sock.recv(64)
         action = action.decode('utf-8')
         if action == "no_photos":
             return
         try:
+            # Assign photo id.
             if (self.cnt < 10):
                 self.cnt_str = '000' + str(self.cnt)
             elif (self.cnt < 100):
@@ -97,30 +96,24 @@ class ClientSocket:
                 self.cnt_str = '0' + str(self.cnt)
             else:
                 self.cnt_str = str(self.cnt)
-            if self.cnt == 0: startTime = time.localtime()
             self.cnt += 1
 
             length = self.recvall(self.sock, 64)
             length1 = length.decode('utf-8')
             stringData = self.recvall(self.sock, int(length1))
             stime = self.recvall(self.sock, 64)
-            #print('send time: ' + stime.decode('utf-8'))
-            now = time.localtime()
-            #print('receive time: ' + datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'))
+
+
             data = numpy.frombuffer(base64.b64decode(stringData), numpy.uint8)
             decimg = cv2.imdecode(data, 1)
-            #cv2.imshow("image", decimg)
+
             cv2.imwrite('./' + str(self.TCP_SERVER_PORT) + '_images' + str(self.folder_num) + '/img' + self.cnt_str + '.jpg', decimg)
-            #cv2.imwrite('./' + str(self.TCP_SERVER_PORT) + '_images' + str(self.folder_num) + '/single_img' + '.jpg', decimg)
+
             cv2.waitKey(1)
-            if (self.cnt == 60 * 10):
-                self.cnt = 0
-                convertThread = threading.Thread(target=self.convertImage(str(self.folder_num), 600, startTime))
-                convertThread.start()
-                self.folder_num = (self.folder_num + 1) % 2
+
         except Exception as e:
             print(e)
-            self.convertImage(str(self.folder_num), self.cnt, startTime)
+            self.convertImage( self.cnt)
             self.sock.close()
             time.sleep(1)
             self.connectServer()
@@ -136,24 +129,6 @@ class ClientSocket:
             if e.errno != errno.EEXIST:
                 print("Failed to create " + folder_name +  " directory")
                 raise
-
-        folder_name = str(self.TCP_SERVER_PORT) + "_images1"
-        try:
-            if not os.path.exists(folder_name):
-                os.makedirs(os.path.join(folder_name))
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                print("Failed to create " + folder_name + " directory")
-                raise
-
-        folder_name = "videos"
-        try:
-            if not os.path.exists(folder_name):
-                os.makedirs(os.path.join(folder_name))
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                print("Failed to create " + folder_name + " directory")
-                raise
         
     def recvall(self, sock, count):
         buf = b''
@@ -164,10 +139,10 @@ class ClientSocket:
             count -= len(newbuf)
         return buf    
 
-    def convertImage(self, fnum, count, now):
+    def convertImage(self, count):
         img_array = []
         self.cnt = 0
-        for filename in glob.glob('./' + str(self.TCP_SERVER_PORT) + '_images' + fnum + '/*.jpg'):
+        for filename in glob.glob('./' + str(self.TCP_SERVER_PORT) + '_images' + '/*.jpg'):
             if (self.cnt == count):
                 break
             self.cnt = self.cnt + 1
@@ -175,36 +150,10 @@ class ClientSocket:
             height, width, layers = img.shape
             size = (width, height)
             img_array.append(img)
-        
-        file_date = self.getDate(now)
-        file_time = self.getTime(now)
-        name = 'video(' + file_date + ' ' + file_time + ').mp4'
-        file_path = './videos/' + name
-        out = cv2.VideoWriter(file_path, cv2.VideoWriter_fourcc(*'.mp4'), 20, size)
-
-        for i in range(len(img_array)):
-            out.write(img_array[i])
-        out.release()
-        print(u'complete')
-
-    def getDate(self, now):
-        year = str(now.tm_year)
-        month = str(now.tm_mon)
-        day = str(now.tm_mday)
-
-        if len(month) == 1:
-            month = '0' + month
-        if len(day) == 1:
-            day = '0' + day
-        return (year + '-' + month + '-' + day)
-
-    def getTime(self, now):
-        file_time = (str(now.tm_hour) + '_' + str(now.tm_min) + '_' + str(now.tm_sec))
-        return file_time
 
 def main():
-    TCP_IP = '192.168.8.115' 
-    TCP_SERVER_PORT = 9999
+    TCP_IP = '192.168.0.15' # Robot Ip address in Wi-Fi network got through linux console
+    TCP_SERVER_PORT = 9997  # Free port (must be the same as on the robot).
     client = ClientSocket(TCP_IP, TCP_SERVER_PORT)
 
 
