@@ -10,6 +10,11 @@ Contains simulation of slam based on observations provided by the user.
 
 Contains all the files responsible for connecting to robot, moving it and taking pictures with the camera.
 
-*./image_processing*
+*./camera_calibration*
 
 Contains the script and the complete dataset requried to calibrate the realsense camera.
+
+*./image_processing*
+
+Containes the script required to reconstruct the 3d points from 2d-image coordinates using the
+camera matrix obratined in the process of camera calibration.
